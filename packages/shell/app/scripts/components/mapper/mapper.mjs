@@ -184,6 +184,14 @@ export class Mapper extends HTMLElement {
 
   }
 
+  #fullscreen = async () => {
+    const screens = (await window.getScreenDetails()).screens
+    console.log(screens)
+    // await document.body.requestFullscreen({
+    //   screen: otherScreen
+    // });
+  }
+
   async connectedCallback() {
     this.#resizeObserver = new ResizeObserver(this.#onCanvasResize)
     this.#resizeObserver.observe(this.#gl.canvas)
@@ -192,6 +200,8 @@ export class Mapper extends HTMLElement {
 
     this.#frameList.addEventListener("change", this.#updateGeometry)
     this.#updateGeometry()
+
+    await this.#fullscreen()
 
     requestAnimationFrame(this.#render)
 

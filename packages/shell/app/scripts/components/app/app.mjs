@@ -21,7 +21,7 @@ export class AppComponent extends HTMLElement {
       `resizable=yes`,
       `scrollbars=no`
     ].join(",")
-    return window.open("mapping.html", Math.random().toString(), features);
+    return window.open("mapping.html", Math.random().toString(), features)
   }
 
   #config = new Content()
@@ -36,7 +36,9 @@ export class AppComponent extends HTMLElement {
 
   #runMappers = async () => {
     const screens = (await window.getScreenDetails()).screens
+    console.dir(screens)
     for (const { left, top } of screens) {
+      console.log(left, top)
       const m1 = AppComponent.MappingWindow(left, top, 100, 100)
       console.log(m1)
     }
