@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 	"os/exec"
-	"path/filepath"
+	// "path/filepath"
 	"runtime"
 )
 
@@ -59,14 +59,14 @@ func (c *Chromium) Kiosk(id int, location [2]int16, url string) error {
 }
 
 func (c *Chromium) KioskCommand(id int, location [2]int16, url string) *exec.Cmd {
-	dataPathAbs, err := filepath.Abs(filepath.Join(c.dataPath, fmt.Sprintf("/%d", id)))
-	if err != nil {
-		log.Fatalf("Chromium [KioskCommand] Incorrect data path: %v\n", err)
-	}
+	// dataPathAbs, err := filepath.Abs(filepath.Join(c.dataPath, fmt.Sprintf("/%d", id)))
+	// if err != nil {
+	// 	log.Fatalf("Chromium [KioskCommand] Incorrect data path: %v\n", err)
+	// }
 	return exec.Command(
 		c.binaryPath,
-		fmt.Sprintf("--user-data-dir=%s", dataPathAbs),
-		fmt.Sprintf("--profile-directory=%s", c.profile),
+		fmt.Sprintf("--user-data-dir=%s", c.dataPath),
+		fmt.Sprintf("--profile-directory=%s-%d", c.profile, id),
 		fmt.Sprintf("--window-position=%d,%d", location[0], location[1]),
 		"--disable-gesture-requirement-for-presentation",
 		"--autoplay-policy=no-user-gesture-required",

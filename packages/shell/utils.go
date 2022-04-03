@@ -25,7 +25,7 @@ func getExecName() string {
 
 func getLogFilePath() string {
   execName := getExecName()
-  return "./" + strings.TrimSuffix(execName, filepath.Ext(execName)) + ".log"
+  return filepath.Join(os.TempDir(), strings.TrimSuffix(execName, filepath.Ext(execName)) + ".log")
 }
 
 func getConfigFilePath() string {
