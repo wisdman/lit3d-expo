@@ -1,5 +1,5 @@
 
-import { flatIterator  } from "./utils.mjs"
+import { flatIterator, filterUndefined } from "./utils.mjs"
 
 import { Float32, Float64, Int8, Int16, Int32, Int64, UInt8, UInt16, UInt32, UInt64 } from "./numeric.mjs"
 
@@ -23,7 +23,7 @@ class Vector {
   }
 
   constructor(...args) {
-    const items = [...flatIterator(args)]
+    const items = [...flatIterator(filterUndefined(args))]
 
     const length = items.length
 

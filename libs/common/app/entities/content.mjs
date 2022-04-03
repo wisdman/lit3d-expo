@@ -6,7 +6,7 @@ import { SoundList } from "./sound-list.mjs"
 export class Content {
   #id = ""
   get id() { return this.#id }
-  set id(id) { 
+  set id(id = "") { 
     if (typeof id !== "string")
       throw new TypeError(`Mapping [set id]: "${id}" isn't string value`)
     this.#id = id
@@ -14,7 +14,7 @@ export class Content {
 
   #title = ""
   get title() { return this.#title }
-  set title(title) { 
+  set title(title = "") { 
     if (typeof title !== "string")
       throw new TypeError(`Mapping [set title]: "${title}" isn't string value`)
     this.#title = title
@@ -22,7 +22,7 @@ export class Content {
 
   #description = ""
   get description() { return this.#description }
-  set description(description) {
+  set description(description ="") {
     if (typeof description !== "string")
       throw new TypeError(`Mapping [set description]: "${description}" isn't string value`)
     this.#description = description
@@ -58,3 +58,7 @@ export class Content {
     ...(this.#sound.length ? {sound: this.#sound} : {}),
   }}
 }
+
+
+const ctn = new Content()
+console.log(JSON.stringify(ctn))

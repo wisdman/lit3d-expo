@@ -5,7 +5,6 @@ import (
 	"crypto/tls"
 	"log"
 	"net/http"
-	"os"
 	"path/filepath"
 	"time"
 )
@@ -15,15 +14,6 @@ type Service struct {
 	server   *http.Server
 	certFile string
 	keyFile  string
-}
-
-var addr string
-
-func init() {
-	addr = ":" + os.Getenv("PORT")
-	if addr == ":" {
-		addr = ":443"
-	}
 }
 
 func New(certFile, keyFile string) *Service {
@@ -54,7 +44,7 @@ func New(certFile, keyFile string) *Service {
   }
 
 	service.server = &http.Server{
-		Addr: addr,
+		Addr: ":443",
 		Handler: service.mux,
 		TLSConfig: tlsConfig,
 	}

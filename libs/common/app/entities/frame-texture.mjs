@@ -1,5 +1,5 @@
 
-import { flatIterator } from "../types/utils.mjs"
+import { flatIterator, filterUndefined } from "../types/utils.mjs"
 import { UInt8 } from "../types/numeric.mjs"
 import { Float32Vector2 } from "../types/vector.mjs"
 
@@ -59,7 +59,7 @@ export class FrameTexture {
   }
 
   constructor(...args) {
-    const [id, ...items] = [...flatIterator(args)]
+    const [id, ...items] = [...flatIterator(filterUndefined(args))]
     const length = items.length
 
     if (id === undefined && length === 0) { // Default FrameTexture 

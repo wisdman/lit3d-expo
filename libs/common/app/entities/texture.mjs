@@ -1,8 +1,9 @@
 
 import { UInt8 } from "../types/numeric.mjs"
-import { Int8Vector3 } from "../types/vector.mjs"
+import { UInt8Vector3 } from "../types/vector.mjs"
 
 import { MAX_VIOLUME } from "./constants.mjs"
+import { TextureMask } from "./texture-mask.mjs"
 
 export class Texture {
   #id = new UInt8()
@@ -23,7 +24,7 @@ export class Texture {
 }
 
 export class UrlTexture extends Texture {
-  static isUrlTexture = ({ url } = {}) => !!url
+  static isUrlTexture = ({ url } = {}) => url !== undefined
   
   #url = ""
   get url() { return this.#url }
@@ -53,11 +54,11 @@ export class UrlTexture extends Texture {
 }
 
 export class MaskTexture extends Texture {
-  static isMaskTexture = ({ mask } = {}) => !!mask
+  static isMaskTexture = ({ mask } = {}) => mask !== undefined
 
-  #mask = new Mask()
+  #mask = new TextureMask()
   get mask() { return this.#mask }
-  set mask(mask) { this.#mask = new Mask() }
+  set mask(mask) { this.#mask = new TextureMask(mask) }
 
   constructor({ mask, ...args } = {}) {
     super(args)
@@ -71,11 +72,11 @@ export class MaskTexture extends Texture {
 }
 
 export class ColorTexture extends Texture {
-  static isColorTexture = ({ color } = {}) => !!color
+  static isColorTexture = ({ color } = {}) => color !== undefined
 
-  #color = new Int8Vector3()
+  #color = new UInt8Vector3()
   get color() { return this.#color }
-  set color(color) { this.#color = new Int8Vector3(color) }
+  set color(color) { this.#color = new UInt8Vector3(color) }
 
   constructor({ color, ...args } = {}) {
     super(args)

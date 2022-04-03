@@ -27,7 +27,7 @@ node_modules/
 !/build/.gitkeep
 
 ### Chromium Embedded directory ###
-/chromium/*
+/chromium
 !/chromium/.gitkeep
 
 ### Chromium data directory ###
@@ -39,6 +39,7 @@ node_modules/
 !/content/.gitkeep
 
 ### Runtime environment ###
+/shell.json
 *.env
 *.lock
 *.pid

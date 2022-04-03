@@ -39,8 +39,7 @@ export class Frame {
     return this.#mask.positions
   }
 
-  constructor({ id, size, texture, mask } = {}) {
-    super()
+  constructor({ id, size, corners, texture, mask } = {}) {
     this.id = id
     this.size = size
     this.texture = texture
@@ -49,8 +48,8 @@ export class Frame {
 
   toJSON() { return {
     id: this.#id,
-    corners: this.#corners,
     size: this.#size,
+    corners: this.#corners,
     texture: this.#texture,
     mask: this.#mask,
   }}

@@ -7,4 +7,4 @@ import (
 
 //go:embed app/*
 var commonEmbedFS embed.FS
-var FS, _ = fs.Sub(commonEmbedFS, "app")
+var APP, _ = fs.Sub(commonEmbedFS, "app")

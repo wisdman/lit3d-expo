@@ -1,20 +1,11 @@
 
-import { flatIterator } from "./utils.mjs"
+import { flatIterator, filterUndefined} from "./utils.mjs"
 
 export class List extends Set {
   static TYPE = null
   get type() { return Object.getPrototypeOf(this).constructor.TYPE }
 
   get length() { return this.size } 
-
-  get next() {
-    for (let i = 0; i < MAX_FRAMES; i++) {
-      if (!this.#list.find(f => f.id === i)) return i
-    }
-    throw new Error("Too many frames")
-  }
-  get length() { return this.#list.length }
-
 
   new = (...args) => {
     const item = new this.type(...args)
@@ -30,7 +21,7 @@ export class List extends Set {
 
   constructor(...args) {    
     super()
-    const items = [...flatIterator(args)]
+    const items = [...flatIterator(filterUndefined(args))]
     for (const item of items) {
       if (item instanceof this.type) { this.add(item) }
       else { this.new(item) }

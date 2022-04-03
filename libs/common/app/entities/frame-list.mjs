@@ -2,7 +2,7 @@
 import { IdsList } from "./ids-list.mjs"
 
 import { Frame } from "./frame.mjs"
-import { MAX_FRAMES } from "../constants.mjs"
+import { MAX_FRAMES } from "./constants.mjs"
 
 export class FrameList extends IdsList {
   static TYPE = Frame

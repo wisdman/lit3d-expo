@@ -1,5 +1,5 @@
 
-import { flatIterator } from "../types/utils.mjs"
+import { flatIterator, filterUndefined } from "../types/utils.mjs"
 import { Int16Vector2 } from "../types/vector.mjs"
 
 import { DEFAULT_RESOLUTION } from "./constants.mjs"
@@ -57,7 +57,7 @@ export class FrameCorners {
   }
 
   constructor(...args) {
-    const items = [...flatIterator(args)]
+    const items = [...flatIterator(filterUndefined(args))]
     const length = items.length
 
     if (length === 0) { // Default Corners 
