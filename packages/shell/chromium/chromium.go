@@ -12,29 +12,35 @@ const (
 
   chromiumPathDarwin = "/Applications/Google Chrome Beta.app/Contents/MacOS/"
   chromiumPathLinux = "./chromium"
-  chromiumPathWindows = "./chromium"
+  chromiumPathWindows = "C:\\Program Files\\Chromium"
   
   chromiumBinaryDarwin = "Google Chrome Beta"
   chromiumBinaryLinux = "chromium"
   chromiumBinaryWindows = "chrome.exe"
 
-  chromiumData = "./chromium-data"
+  chromiumDataDarwin = "./chromium-data"
+  chromiumDataLinux = "./chromium-data"
+  chromiumDataWindows = "C:\\Users\\User\\AppData\\Local\\Chromium\\User Data"
 )
 
 var chromiumPath string
 var chromiumBinary string
+var chromiumData string
 
 func init() {
   switch os := runtime.GOOS; os {
     case "darwin":
     	chromiumPath = chromiumPathDarwin
-    	chromiumBinary = chromiumBinaryDarwin
+      chromiumBinary = chromiumBinaryDarwin
+    	chromiumData = chromiumDataDarwin
     case "linux":
     	chromiumPath = chromiumPathLinux
-    	chromiumBinary = chromiumBinaryLinux
+      chromiumBinary = chromiumBinaryLinux
+    	chromiumData = chromiumDataLinux
     case "windows":
       chromiumPath = chromiumPathWindows
-    	chromiumBinary = chromiumBinaryWindows
+      chromiumBinary = chromiumBinaryWindows
+    	chromiumData = chromiumDataWindows
     default:
       log.Fatalf("Chromium [init]: Incorrect runtime %s\n", os)
   }
@@ -59,7 +65,6 @@ func New() *Chromium {
     log.Fatalf("Chromium [New]: Incorrect binary path: %+v\n", err)
   }
 
-  // absDataPath, err := filepath.Abs(filepath.Join(os.TempDir(), chromiumData))
   absDataPath, err := filepath.Abs(chromiumData)
   if err != nil {
     log.Fatalf("Chromium [New]: Incorrect data path: %+v\n", err)
