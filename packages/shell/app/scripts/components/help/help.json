@@ -1,0 +1,63 @@
+[{
+  "title": "Global commands",
+  "commands":{
+    "E": "Exec commands editor",
+    "S": "Sound editor",
+    "M": "Mapper"
+  }
+},{
+  "title": "Exec commands [E]",
+  "commands":{
+    "A": "Add command",
+    "D": "Delete command",
+    "R": "Run command now",
+    "↑": "Prew",
+    "↓": "Next" 
+  }
+},{
+  "title": "Sound [S]",
+  "commands":{
+    "C": "New sound from content",
+    "U": "New sound from url",
+    "P": "Play/Pause",
+    "O": "Select output",
+    "D": "Delete sound",
+    "↑": "Prew",
+    "↓": "Next" 
+  }
+},{
+  "title": "Mapping [M]",
+  "commands":{
+    "T": "Open textures editor",
+    "F": "Open frames editor",
+    "U": "Fullscreen url",
+    "M": "Metadata editor"
+  }
+},{
+  "title": "Textures [T]",
+  "commands":{
+    "C": "New color texture",
+    "U": "New texture from url",
+    "D": "Delete texture",
+    "←": "Prew",
+    "→": "Next"                 
+  }
+},{
+  "title": "Frames [F]",
+  "commands":{
+    "A": "Add frame",
+    "T": "Select texture",
+    "R": "Set resolution",
+    "D": "Delete frame",
+    "1..9": "Activate frame",    
+    "0": "Activate Left-top corner",    
+    "1": "Activate Right-top corner",    
+    "2": "Activate Right-bottom corner",    
+    "3": "Activate Left-bottom corner",    
+    "Esc": "Deactivate corner or frame",
+    "←": "Move Left (Shift x10)",
+    "→": "Move Right (Shift x10)",
+    "↑": "Move Up (Shift x10)",
+    "↓": "Move Down (Shift x10)"        
+  }
+}]

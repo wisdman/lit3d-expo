@@ -1,0 +1,31 @@
+:host {
+  position: relative;
+  box-sizing: border-box;
+  justify-self: center;
+  align-self: center;
+
+  --gap: 32px;
+  width: calc(100% - var(--gap));
+  height: calc(100% - var(--gap));
+  padding: var(--gap);
+
+  background: rgb(36 41 47 / 1);
+  border-radius: 13px;
+
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+section {
+  display: grid;
+  grid-template-columns: repeat(4, 35px 400px);
+  gap: calc(var(--gap) / 2);
+}
+
+h1 {
+  grid-area: 1 / 1 / span 1 / -1;
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.2em;
+}

@@ -1,0 +1,25 @@
+:host {
+  position: relative;
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 100%;
+
+  justify-items: stretch;
+  align-items: stretch;
+}
+
+:host > * { grid-area: 1 / 1 / -1 / -1; }
+
+svg { display: block; }
+
+path, circle {
+  stroke: var(--frame-color);
+  stroke-width: 2px;
+  fill: transparent;
+}
+
+.active {
+  stroke: var(--active-color);
+}

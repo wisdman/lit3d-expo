@@ -1,0 +1,14 @@
+:host {
+  display: block;
+  position: relative;
+  box-sizing: border-box;
+
+  display: grid;
+  grid-template-columns: 100%;
+  grid-template-rows: 100%;
+
+  justify-items: stretch;
+  align-items: stretch;
+}
+
+:host > * { grid-area: 1 / 1 / -1 / -1; }
