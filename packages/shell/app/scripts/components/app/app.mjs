@@ -1,67 +1,52 @@
-import { Keyboard } from "../../services/keyboard.mjs"
-import { ID, MAPPING_ID, API_PATH_CONFIG } from "../../services/api.mjs"
 
-import { Mapper } from "../mapper/mapper.mjs"
-import { FullScreen } from "../full-screen/full-screen.mjs"
+import { Content } from "/common/entities/content.mjs"
+
+import { ID, API_PATH_CONFIG } from "../../services/api.mjs"
+
+import { ConfigEditor } from "../config-editor/config-editor.mjs"
 
 import CSS from "./app.css" assert { type: "css" }
 
 export class AppComponent extends HTMLElement {
-  #keyboard = new Keyboard()
-  #mapper = undefined
-  
+  static MappingWindow = (left, top, w, h) => {
+    const features = [
+      `left=${left}`,
+      `top=${top}`,
+      `width=${w}`,
+      `height=${h}`,
+      `menubar=no`,
+      `toolbar=no`,
+      `location=no`,
+      `status=no`,
+      `resizable=yes`,
+      `scrollbars=no`
+    ].join(",")
+    return window.open("mapping.html", Math.random().toString(), features);
+  }
+
+  #config = new Content()
+  #editor = new ConfigEditor()
+
   constructor() {
     super()
     this.attachShadow({mode: "open"}).adoptedStyleSheets = [CSS]
-    this.#initKeyboard()
   }
 
   #fetchConfig = async () => await (await fetch(API_PATH_CONFIG)).json()
-  #mappingConfig = async () => (await this.#fetchConfig()).mapping?.[MAPPING_ID]
+
+  #runMappers = async () => {
+    const screens = (await window.getScreenDetails()).screens
+    for (const { left, top } of screens) {
+      const m1 = AppComponent.MappingWindow(left, top, 100, 100)
+      console.log(m1)
+    }
+  }
 
   async connectedCallback() {
-    const mappingConfig = await this.#mappingConfig()
-    this.#mapper = mappingConfig
-                 ? document.body.appendChild( mappingConfig.url 
-                                            ? new FullScreen(mappingConfig) 
-                                            : new Mapper(mappingConfig)
-                                            )
-                 : undefined
-    this.#keyboard.active = true
-
-    // console.dir(await window.getScreenDetails())
-  }
-
-  disconnectedCallback() {
-    this.#keyboard.active = false
-    if (this.#mapper) document.body.removeChild(this.#mapper)
-  }
-
-  #initKeyboard = () => {
-    this.#keyboard.on("CTRL+A", this.#onMetaAKey) // Audio config
-    this.#keyboard.on("META+A", this.#onMetaAKey) // Audio config
-    this.#keyboard.on("CTRL+E", this.#onMetaEKey) // Exec config
-    this.#keyboard.on("META+E", this.#onMetaEKey) // Exec config
-    this.#keyboard.on("CTRL+M", this.#onMetaMKey) // Edit screens
-    this.#keyboard.on("META+M", this.#onMetaMKey) // Edit screens
-    this.#keyboard.on("CTRL+S", this.#onMetaSKey) // Save config
-    this.#keyboard.on("META+S", this.#onMetaSKey) // Save config
-  }
-
-  #onMetaAKey = async () => {
-    console.log("CTRL+A")
-  }
-
-  #onMetaEKey = async () => {
-    console.log("CTRL+E")
-  }
-
-  #onMetaMKey = async () => {
-    console.log("CTRL+M")
-  }
-
-  #onMetaSKey = async () => {
-    console.log(JSON.stringify(this.#mapper))
+    const config = await this.#fetchConfig()
+    this.#config = new Content(config)
+    this.shadowRoot.appendChild(this.#editor)
+    await this.#runMappers()
   }
 }
 
