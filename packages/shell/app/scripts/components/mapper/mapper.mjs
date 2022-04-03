@@ -1,4 +1,6 @@
 
+import { MAPPING_ID } from "../../services/api.mjs"
+
 import { Keyboard } from "../../services/keyboard.mjs"
 
 import { ViewProjectionMatrix } from "./math/projection.mjs"
@@ -185,11 +187,9 @@ export class Mapper extends HTMLElement {
   }
 
   #fullscreen = async () => {
-    const screens = (await window.getScreenDetails()).screens
-    console.log(screens)
-    // await document.body.requestFullscreen({
-    //   screen: otherScreen
-    // });
+    console.log(MAPPING_ID)
+    const screen = (await window.getScreenDetails()).screens[MAPPING_ID]
+    await document.body.requestFullscreen({ screen })
   }
 
   async connectedCallback() {

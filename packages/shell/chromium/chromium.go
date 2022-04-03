@@ -2,7 +2,7 @@ package chromium
 
 import (
 	"log"
-	// "os"
+	"os"
 	"path/filepath"
 	"runtime"
 )
@@ -20,7 +20,7 @@ const (
 
   chromiumDataDarwin = "./chromium-data"
   chromiumDataLinux = "./chromium-data"
-  chromiumDataWindows = "C:\\Users\\User\\AppData\\Local\\Chromium\\User Data"
+  chromiumDataWindows = "./chromium-data"
 )
 
 var chromiumPath string
@@ -65,7 +65,7 @@ func New() *Chromium {
     log.Fatalf("Chromium [New]: Incorrect binary path: %+v\n", err)
   }
 
-  absDataPath, err := filepath.Abs(chromiumData)
+  absDataPath, err := filepath.Abs(filepath.Join(os.TempDir(), chromiumData))
   if err != nil {
     log.Fatalf("Chromium [New]: Incorrect data path: %+v\n", err)
   }

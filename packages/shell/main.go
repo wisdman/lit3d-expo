@@ -58,7 +58,7 @@ func main() {
   srv.FS("/content/", http.StripPrefix("/content/", http.FileServer(config.GetContentFS())))
 
   srv.ListenAndServe()
-  core.Run()
+  core.Multiscreen()
 
   stop := make(chan os.Signal, 1)
   signal.Notify(stop, os.Interrupt, syscall.SIGTERM)

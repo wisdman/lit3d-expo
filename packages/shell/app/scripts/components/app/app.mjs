@@ -8,12 +8,12 @@ import { ConfigEditor } from "../config-editor/config-editor.mjs"
 import CSS from "./app.css" assert { type: "css" }
 
 export class AppComponent extends HTMLElement {
-  static MappingWindow = (left, top, w, h) => {
+  static MappingWindow = id => {
     const features = [
-      `left=${left}`,
-      `top=${top}`,
-      `width=${w}`,
-      `height=${h}`,
+      `left=0`,
+      `top=0`,
+      `width=480`,
+      `height=270`,
       `menubar=no`,
       `toolbar=no`,
       `location=no`,
@@ -21,7 +21,7 @@ export class AppComponent extends HTMLElement {
       `resizable=yes`,
       `scrollbars=no`
     ].join(",")
-    return window.open("mapping.html", Math.random().toString(), features)
+    return window.open(`mapping.html#${id}`, `mapping-${id}`, features)
   }
 
   #config = new Content()
@@ -36,12 +36,22 @@ export class AppComponent extends HTMLElement {
 
   #runMappers = async () => {
     const screens = (await window.getScreenDetails()).screens
-    console.dir(screens)
-    for (const { left, top } of screens) {
-      console.log(left, top)
-      const m1 = AppComponent.MappingWindow(left, top, 100, 100)
-      console.log(m1)
+    for (const [i] of screens.entries()) {
+      console.log(i)
+      // AppComponent.MappingWindow(i)
     }
+
+    //const mappers = 
+    // console.log(this.#config.mapping)
+
+
+    // const screens = (await window.getScreenDetails()).screens
+    // console.dir(screens)
+    // for (const { left, top } of screens) {
+    //   console.log(left, top)
+    //   const m1 = AppComponent.MappingWindow(left, top, 100, 100)
+    //   console.log(m1)
+    // }
   }
 
   async connectedCallback() {
