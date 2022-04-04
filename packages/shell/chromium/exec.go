@@ -30,12 +30,11 @@ func (c *Chromium) Command(url string) *exec.Cmd {
 		c.binaryPath,
 		// fmt.Sprintf("--user-data-dir=\"%s\"", c.dataPath),
 		fmt.Sprintf("--profile-directory=%s", c.profile),
-		fmt.Sprintf("--window-position=%d,%d", 0, 0),
 		"--disable-gesture-requirement-for-presentation",
 		"--autoplay-policy=no-user-gesture-required",
 		fmt.Sprintf("--unsafely-treat-insecure-origin-as-secure=%s", url),
 		"--no-default-browser-check",
-		"-disable-logging",
+		"--disable-logging",
 		"--disable-breakpad",
 		url,
 	)

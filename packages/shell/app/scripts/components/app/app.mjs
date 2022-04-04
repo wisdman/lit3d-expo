@@ -8,18 +8,18 @@ import { ConfigEditor } from "../config-editor/config-editor.mjs"
 import CSS from "./app.css" assert { type: "css" }
 
 export class AppComponent extends HTMLElement {
-  static MappingWindow = id => {
+  static MappingWindow = (id, left, top) => {
     const features = [
-      `left=0`,
-      `top=0`,
+      `left=${left}`,
+      `top=${top}`,
       `width=480`,
       `height=270`,
-      `menubar=no`,
-      `toolbar=no`,
-      `location=no`,
-      `status=no`,
-      `resizable=yes`,
-      `scrollbars=no`
+      // `menubar=no`,
+      // `toolbar=no`,
+      // `location=no`,
+      // `status=no`,
+      // `resizable=yes`,
+      // `scrollbars=no`
     ].join(",")
     return window.open(`mapping.html#${id}`, `mapping-${id}`, features)
   }
@@ -36,9 +36,11 @@ export class AppComponent extends HTMLElement {
 
   #runMappers = async () => {
     const screens = (await window.getScreenDetails()).screens
-    for (const [i] of screens.entries()) {
-      console.log(i)
-      // AppComponent.MappingWindow(i)
+    for (const [i, {left, top}] of screens.entries()) {
+      console.log(i, left, top)
+      const win = AppComponent.MappingWindow(i, left, top)
+      // console.log(win.document.body)
+      // await win.document.body.requestFullscreen()
     }
 
     //const mappers = 

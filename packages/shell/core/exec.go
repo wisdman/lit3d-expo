@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/wisdman/lit3d-expo/packages/shell/screens"
+	"github.com/wisdman/lit3d-expo/packages/shell/screen"
 )
 
 func (c *Core) Run() {
@@ -17,7 +17,7 @@ func (c *Core) Multiscreen() {
 
   
 
-  locations := screens.GetLocations()
+  locations := screen.GetLocations()
   log.Printf("Core [Multiscreen] locations: %v\n", locations)
 
   for i, l := range locations {

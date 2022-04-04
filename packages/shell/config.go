@@ -85,7 +85,9 @@ func (c *Config) Read() {
   return
 }
 
-func (c *Config) patch(configStr string) {
+func (c *Config) Patch(configStr string) {
+  fmt.Println(configStr)
+
   if (configStr == "") {
     return
   }
@@ -128,7 +130,7 @@ func NewConfig(configStr string) *Config {
   }
 
    config.Read()
-   config.patch(configStr)
+   config.Patch(configStr)
    
    return config
 }

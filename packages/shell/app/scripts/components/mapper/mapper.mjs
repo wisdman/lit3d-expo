@@ -187,8 +187,8 @@ export class Mapper extends HTMLElement {
   }
 
   #fullscreen = async () => {
-    console.log(MAPPING_ID)
-    const screen = (await window.getScreenDetails()).screens[MAPPING_ID]
+    // console.log(MAPPING_ID)
+    const screen = (await window.getScreenDetails()).currentScreen
     await document.body.requestFullscreen({ screen })
   }
 
@@ -201,12 +201,14 @@ export class Mapper extends HTMLElement {
     this.#frameList.addEventListener("change", this.#updateGeometry)
     this.#updateGeometry()
 
-    await this.#fullscreen()
+    // await this.#fullscreen()
 
     requestAnimationFrame(this.#render)
 
     this.paused = false
     this.#keyboard.active = true
+
+
   }
 
   disconnectedCallback() {
