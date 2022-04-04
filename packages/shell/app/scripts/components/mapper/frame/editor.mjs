@@ -22,7 +22,7 @@ export class Editor extends HTMLElement {
   }
 
   static Corner(frame, i, isActive) {
-    const [cx, cy] = frame.getCorner(i)
+    const [cx, cy] = frame.corners[i]
     const circle = document.createElementNS(SVG_NAMESPACE, "circle")
     circle.setAttributeNS(null, "cx", cx)
     circle.setAttributeNS(null, "cy", cy)
@@ -73,8 +73,7 @@ export class Editor extends HTMLElement {
       this.#activeCorner = -1
     }
 
-    for (var i = 0, l = this.#frames.length; i < l; i++) {
-      const frame = this.#frames.get(i)
+    for (const [i, frame] of  [...this.#frames].entries()) {
       this.#svg.appendChild(Editor.Path(frame, i === this.#activeFrame))
       this.#svg.appendChild(Editor.Corner(frame, 0, i === this.#activeFrame && this.#activeCorner === 0))
       this.#svg.appendChild(Editor.Corner(frame, 1, i === this.#activeFrame && this.#activeCorner === 1))
@@ -132,8 +131,14 @@ export class Editor extends HTMLElement {
   #on3Key = () => this.#activateCorner(3)
   #on4Key = () => this.#activateCorner(4)
   
-  #onAKey = () => this.#frames.add()
-  #onDKey = () => this.#isFrameActive && this.#frames.remove(this.#frames.get(this.#activeFrame))
+  #onAKey = () => {
+    this.#frames.new()
+    this.#render()
+  }
+  #onDKey = () => {
+    this.#isFrameActive && this.#frames.remove(this.#frames.get(this.#activeFrame))
+    this.#render()
+  }
   
   #onPKey = () => this.#textures.play()
   #onShiftPKey = () => this.#textures.pause()
@@ -153,29 +158,41 @@ export class Editor extends HTMLElement {
     this.#keyboard.active = true
   }
   
-  #onLeftKey = ({shift}) => this.#isCornerActive 
-                          ? this.#frames.get(this.#activeFrame).moveCorner(this.#activeCorner, shift ? -10 : -1, 0)
-                          : this.#isFrameActive
-                          ? this.#frames.get(this.#activeFrame).move(shift ? -10 : -1, 0)
-                          : undefined
+  #onLeftKey = ({shift}) => {
+    this.#isCornerActive 
+    ? this.#frames.get(this.#activeFrame).moveCorner(this.#activeCorner, shift ? -10 : -1, 0)
+    : this.#isFrameActive
+    ? this.#frames.get(this.#activeFrame).move(shift ? -10 : -1, 0)
+    : undefined;
+    this.#render()
+  }
   
-  #onRightKey = ({shift}) => this.#isCornerActive 
-                          ? this.#frames.get(this.#activeFrame).moveCorner(this.#activeCorner, shift ? 10 : 1, 0)
-                          : this.#isFrameActive
-                          ? this.#frames.get(this.#activeFrame).move(shift ? 10 : 1, 0)
-                          : undefined
+  #onRightKey = ({shift}) => {
+    this.#isCornerActive 
+    ? this.#frames.get(this.#activeFrame).moveCorner(this.#activeCorner, shift ? 10 : 1, 0)
+    : this.#isFrameActive
+    ? this.#frames.get(this.#activeFrame).move(shift ? 10 : 1, 0)
+    : undefined;
+    this.#render()
+  }
   
-  #onUpKey = ({shift}) => this.#isCornerActive 
-                          ? this.#frames.get(this.#activeFrame).moveCorner(this.#activeCorner, 0, shift ? -10 : -1)
-                          : this.#isFrameActive
-                          ? this.#frames.get(this.#activeFrame).move(0, shift ? -10 : -1)
-                          : undefined
+  #onUpKey = ({shift}) => {
+    this.#isCornerActive 
+    ? this.#frames.get(this.#activeFrame).moveCorner(this.#activeCorner, 0, shift ? -10 : -1)
+    : this.#isFrameActive
+    ? this.#frames.get(this.#activeFrame).move(0, shift ? -10 : -1)
+    : undefined;
+    this.#render()
+  }
   
-  #onDownKey = ({shift}) => this.#isCornerActive 
-                          ? this.#frames.get(this.#activeFrame).moveCorner(this.#activeCorner, 0, shift ? 10 : 1)
-                          : this.#isFrameActive
-                          ? this.#frames.get(this.#activeFrame).move(0, shift ? 10 : 1)
-                          : undefined
+  #onDownKey = ({shift}) => {
+    this.#isCornerActive 
+    ? this.#frames.get(this.#activeFrame).moveCorner(this.#activeCorner, 0, shift ? 10 : 1)
+    : this.#isFrameActive
+    ? this.#frames.get(this.#activeFrame).move(0, shift ? 10 : 1)
+    : undefined;
+    this.#render()
+  }
   
   #onEscKey = () => {
     if (this.#isCornerActive) {
@@ -194,13 +211,13 @@ export class Editor extends HTMLElement {
   }
 
   connectedCallback() {
-    this.#frames.addEventListener("change", this.#render, { passive: true })
+    // this.#frames.addEventListener("change", this.#render, { passive: true })
     this.#render()
     this.#keyboard.active = true
   }
 
   disconnectedCallback() {
-    this.#frames.removeEventListener("change", this.#render)
+    // this.#frames.removeEventListener("change", this.#render)
     this.shadowRoot.innerHTML = ""
     this.#keyboard.active = false
   }

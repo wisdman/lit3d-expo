@@ -58,7 +58,3 @@ export class Content {
     ...(this.#sound.length ? {sound: this.#sound} : {}),
   }}
 }
-
-
-const ctn = new Content()
-console.log(JSON.stringify(ctn))

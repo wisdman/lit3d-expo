@@ -1,6 +1,4 @@
 
-import { MAPPING_ID } from "../../services/api.mjs"
-
 import { Keyboard } from "../../services/keyboard.mjs"
 
 import { ViewProjectionMatrix } from "./math/projection.mjs"
@@ -8,7 +6,7 @@ import { ProcessVectorArray } from "./math/process.mjs"
 
 import { DEFAULT_RESOLUTION, DEFAULT_FPS, VERTEX_SIZE, TEXTCORD_SIZE, VERTEX_COUNT, DEFAULT_SCREEN_LOACTION } from "./constants.mjs"
 
-import { List as FrameList } from "./frame/list.mjs"
+import { FrameList } from "/common/entities/frame-list.mjs"
 import { Editor as FrameEditor } from "./frame/editor.mjs"
 
 import { List as TextureList } from "./texture/list.mjs"
@@ -32,10 +30,6 @@ export class Mapper extends HTMLElement {
     powerPreference: "high-performance",
   }
 
-  #id = ""
-  #title = ""
-  #description = ""
-
   #location = [...DEFAULT_SCREEN_LOACTION]
 
   #devicePixelRatio = 1
@@ -55,7 +49,7 @@ export class Mapper extends HTMLElement {
   #positionBuffer = this.#gl.createBuffer()
   #texcoordBuffer = this.#gl.createBuffer()
 
-  #frameList = new FrameList(this.#gl)
+  #frameList = new FrameList()
   #textureList = new TextureList(this.#gl)
   #renderFrames = []
 
@@ -138,8 +132,8 @@ export class Mapper extends HTMLElement {
   }
 
   #updateGeometry = () => {
-    const { positions, texcoords, frames } = this.#frameList
-    const aPositions = ProcessVectorArray(this.#viewProjectionMatrix, positions)
+    const { dstPositions, dstTextureCoords, frames } = this.#frameList
+    const aPositions = ProcessVectorArray(this.#viewProjectionMatrix, dstPositions)
 
     this.#gl.bindVertexArray(this.#vertexArray)
 
@@ -147,9 +141,9 @@ export class Mapper extends HTMLElement {
     this.#gl.bufferData(this.#gl.ARRAY_BUFFER, aPositions, this.#gl.STATIC_DRAW)
 
     this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#texcoordBuffer)
-    this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(texcoords), this.#gl.STATIC_DRAW)
+    this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(dstTextureCoords), this.#gl.STATIC_DRAW)
 
-    this.#renderFrames = [...frames]
+    this.#renderFrames = frames
   }
 
   #onCanvasResize = ([{contentRect: {width, height}}]) => {
@@ -186,11 +180,11 @@ export class Mapper extends HTMLElement {
 
   }
 
-  #fullscreen = async () => {
-    console.log(MAPPING_ID)
-    const screen = (await window.getScreenDetails()).screens[MAPPING_ID]
-    await document.body.requestFullscreen({ screen })
-  }
+  // #fullscreen = async () => {
+  //   console.log(MAPPING_ID)
+  //   const screen = (await window.getScreenDetails()).screens[MAPPING_ID]
+  //   await document.body.requestFullscreen({ screen })
+  // }
 
   async connectedCallback() {
     this.#resizeObserver = new ResizeObserver(this.#onCanvasResize)
@@ -198,10 +192,10 @@ export class Mapper extends HTMLElement {
 
     this.#parseConfig(this.#config)
 
-    this.#frameList.addEventListener("change", this.#updateGeometry)
+    // this.#frameList.addEventListener("change", this.#updateGeometry)
     this.#updateGeometry()
 
-    await this.#fullscreen()
+    // await this.#fullscreen()
 
     requestAnimationFrame(this.#render)
 
@@ -216,7 +210,7 @@ export class Mapper extends HTMLElement {
     this.#resizeObserver = undefined
     this.#keyboard.active = false
 
-    this.#frameList.removeEventListener("change", this.#updateGeometry)
+    // this.#frameList.removeEventListener("change", this.#updateGeometry)
   }
 
   #initKeyboard = () => {
@@ -237,9 +231,6 @@ export class Mapper extends HTMLElement {
   #onPKey = ({shift}) => shift ? this.#textureList.pause() : this.#textureList.play()
 
   toJSON = () => ({
-    id: this.#id,
-    title: this.#title,
-    description: this.#description,
     location: this.#location,
     frames: this.#frameList,
     textures: this.#textureList,

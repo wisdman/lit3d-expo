@@ -7,13 +7,13 @@ export class List extends Set {
 
   get length() { return this.size } 
 
-  new = (...args) => {
+  new(...args) {
     const item = new this.type(...args)
     super.add(item)
     return item
   }
 
-  add = (item) => {
+  add(item) {
     if (!(item instanceof this.type))
       throw new TypeError(`List [add]: Item "${item}" isn't instance of "${this.type.name}"`)
     return super.add(item)
