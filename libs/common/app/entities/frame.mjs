@@ -1,6 +1,9 @@
 
 import { UInt8 } from "../types/numeric.mjs"
 
+import { FindHomography } from "../math/homography.mjs"
+import { ProcessVectorArray } from "../math/process.mjs"
+
 import { FrameCorners } from "./frame-corners.mjs"
 import { FrameSize } from "./frame-size.mjs"
 import { FrameTexture } from "./frame-texture.mjs"
@@ -28,7 +31,7 @@ export class Frame {
 
   get dstPositions() {
     const homographyMatrix = FindHomography(this.#size.cords, [...this.#corners])
-    return ProcessVectorArray(homographyMatrix, this.this.#size.positions)
+    return ProcessVectorArray(homographyMatrix, this.#size.positions)
   }
 
   get dstTextureCoords() {

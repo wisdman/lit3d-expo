@@ -3,7 +3,6 @@ import { flatIterator, filterUndefined } from "../types/utils.mjs"
 
 import { UInt16Vector2 } from "../types/vector.mjs"
 
-import { getPositions } from "./utils.mjs"
 import { DEFAULT_RESOLUTION } from "./constants.mjs"
 
 export class FrameSize extends UInt16Vector2 {
@@ -18,7 +17,16 @@ export class FrameSize extends UInt16Vector2 {
   }
 
   get positions() {
-    return getPositions([...this.cords])
+    const cords = this.cords
+    return [
+      cords[0 * 2 + 0], cords[0 * 2 + 1], 0, 1, // [0] left-top
+      cords[1 * 2 + 0], cords[1 * 2 + 1], 0, 1, // [1] right-top
+      cords[2 * 2 + 0], cords[2 * 2 + 1], 0, 1, // [2] right-bottom
+
+      cords[0 * 2 + 0], cords[0 * 2 + 1], 0, 1, // [0] left-top
+      cords[2 * 2 + 0], cords[2 * 2 + 1], 0, 1, // [2] right-bottom
+      cords[3 * 2 + 0], cords[3 * 2 + 1], 0, 1, // [3] left- bottom
+    ]
   }
 
   constructor(...args) {

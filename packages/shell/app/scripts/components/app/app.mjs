@@ -12,14 +12,14 @@ export class AppComponent extends HTMLElement {
     const features = [
       `left=${left}`,
       `top=${top}`,
-      `width=480`,
-      `height=270`,
-      // `menubar=no`,
-      // `toolbar=no`,
-      // `location=no`,
-      // `status=no`,
-      // `resizable=yes`,
-      // `scrollbars=no`
+      `width=1000`,
+      `height=1000`,
+      `menubar=no`,
+      `toolbar=no`,
+      `location=no`,
+      `status=no`,
+      `resizable=yes`,
+       `scrollbars=no`
     ].join(",")
     return window.open(`mapping.html#${id}`, `mapping-${id}`, features)
   }
@@ -34,6 +34,8 @@ export class AppComponent extends HTMLElement {
 
   #fetchConfig = async () => await (await fetch(API_PATH_CONFIG)).json()
 
+  
+
   #runMappers = async () => {
     const screens = (await window.getScreenDetails()).screens
     for (const [i, {left, top}] of screens.entries()) {
@@ -42,6 +44,7 @@ export class AppComponent extends HTMLElement {
       // console.log(win.document.body)
       // await win.document.body.requestFullscreen()
     }
+
 
     //const mappers = 
     // console.log(this.#config.mapping)

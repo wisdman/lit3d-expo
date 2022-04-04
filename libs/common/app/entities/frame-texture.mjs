@@ -3,8 +3,6 @@ import { flatIterator, filterUndefined } from "../types/utils.mjs"
 import { UInt8 } from "../types/numeric.mjs"
 import { Float32Vector2 } from "../types/vector.mjs"
 
-import { getPositions } from "./utils.mjs"
-
 const SYMBOL_0 = Symbol("0")
 const SYMBOL_1 = Symbol("1")
 const SYMBOL_2 = Symbol("2")
@@ -36,17 +34,21 @@ export class FrameTexture {
   set [3](value) { this[SYMBOL_3] = new Float32Vector2(value) }
 
   get cords() {
-    const [, x, y, w, h] = this
-    return [
-        x   ,   y   , // [0] left-top
-      x + w ,   y   , // [1] right-top
-      x + w , y + h , // [2] right-bottom
-        x   , y + h , // [3] left- bottom
-    ]
+    const [, ...cords] = this
+    return cords
   }
 
   get positions() {
-    return getPositions([...this.cords])
+    const cords = this.cords
+    return [
+      cords[0 * 2 + 0], cords[0 * 2 + 1], // [0] left-top
+      cords[1 * 2 + 0], cords[1 * 2 + 1], // [1] right-top
+      cords[2 * 2 + 0], cords[2 * 2 + 1], // [2] right-bottom
+
+      cords[0 * 2 + 0], cords[0 * 2 + 1], // [0] left-top
+      cords[2 * 2 + 0], cords[2 * 2 + 1], // [2] right-bottom
+      cords[3 * 2 + 0], cords[3 * 2 + 1], // [3] left- bottom
+    ]
   }
 
   *[Symbol.iterator]() {

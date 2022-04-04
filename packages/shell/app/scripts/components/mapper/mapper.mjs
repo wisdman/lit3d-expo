@@ -1,8 +1,9 @@
 
 import { Keyboard } from "../../services/keyboard.mjs"
+import { MAPPING_ID, API_PATH_MOUSE_CLICK } from "../../services/api.mjs"
 
-import { ViewProjectionMatrix } from "./math/projection.mjs"
-import { ProcessVectorArray } from "./math/process.mjs"
+import { ViewProjectionMatrix } from "/common/math/projection.mjs"
+import { ProcessVectorArray } from "/common/math/process.mjs"
 
 import { DEFAULT_RESOLUTION, DEFAULT_FPS, VERTEX_SIZE, TEXTCORD_SIZE, VERTEX_COUNT, DEFAULT_SCREEN_LOACTION } from "./constants.mjs"
 
@@ -180,10 +181,29 @@ export class Mapper extends HTMLElement {
 
   }
 
+
   #fullscreen = async () => {
-    // console.log(MAPPING_ID)
+    await new Promise(resolve => setTimeout(resolve, MAPPING_ID * 1000))
     const screen = (await window.getScreenDetails()).currentScreen
-    await document.body.requestFullscreen({ screen })
+
+    window.addEventListener("pointerdown", async () => {
+      await document.body.requestFullscreen({ screen })
+    }, { once: true, capture: true })
+    
+    const { left, top } = screen
+    await this.#mouseClick(left + 200, top + 200)
+  }
+
+  #mouseClick = async (x, y) => {
+    const rawResponse = await fetch(API_PATH_MOUSE_CLICK, {
+      method: "POST",
+      headers: {
+        "Accept": "application/json",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({x, y})
+    })
+    
   }
 
   async connectedCallback() {
@@ -195,7 +215,7 @@ export class Mapper extends HTMLElement {
     // this.#frameList.addEventListener("change", this.#updateGeometry)
     this.#updateGeometry()
 
-    // await this.#fullscreen()
+    await this.#fullscreen()
 
     requestAnimationFrame(this.#render)
 
@@ -225,7 +245,9 @@ export class Mapper extends HTMLElement {
     const width = this.#gl.canvas.width
     const height = this.#gl.canvas.height
     const frameEditor = new FrameEditor(this.#frameList, this.#textureList, [width, height])
+    frameEditor.addEventListener("render", this.#updateGeometry)
     await this.shadowRoot.appendChild(frameEditor).wait()
+    frameEditor.removeEventListener("render", this.#updateGeometry)
     this.shadowRoot.removeChild(frameEditor)
     this.#keyboard.active = true
   }

@@ -52,6 +52,7 @@ func main() {
   api.GET("/config/exec", api.GetConfigExec)
   api.GET("/config/mapping", api.GetConfigMapping)
   api.GET("/config/sound", api.GetConfigSound)
+  api.POST("/mouse/click", api.MouseClick)
 
   srv.FS("/", http.FileServer(config.GetAppFS()))
   srv.FS("/common/", http.StripPrefix("/common/", http.FileServer(config.GetCommonFS())))

@@ -86,8 +86,6 @@ func (c *Config) Read() {
 }
 
 func (c *Config) Patch(configStr string) {
-  fmt.Println(configStr)
-
   if (configStr == "") {
     return
   }
