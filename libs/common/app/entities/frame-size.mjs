@@ -1,4 +1,6 @@
 
+import { flatIterator, filterUndefined } from "../types/utils.mjs"
+
 import { UInt16Vector2 } from "../types/vector.mjs"
 
 import { getPositions } from "./utils.mjs"
@@ -20,6 +22,7 @@ export class FrameSize extends UInt16Vector2 {
   }
 
   constructor(...args) {
-    super(args.length ? args : DEFAULT_RESOLUTION)
+    const items = [...flatIterator(filterUndefined(args))]
+    super(items.length ? items : DEFAULT_RESOLUTION)
   }
 }

@@ -16,7 +16,7 @@ const FLAT_SIZE = SIZE * 2
 export class FrameCorners {
   ;[SYMBOL_0] = new Int16Vector2( 0,  0) // [0] left-top
   ;[SYMBOL_1] = new Int16Vector2(DW,  0) // [1] right-top
-  ;[SYMBOL_2] = new Int16Vector2(DW, WH) // [2] right-bottom
+  ;[SYMBOL_2] = new Int16Vector2(DW, DH) // [2] right-bottom
   ;[SYMBOL_3] = new Int16Vector2( 0, DH) // [3] left- bottom
 
   get [0]() { return this[SYMBOL_0] }
