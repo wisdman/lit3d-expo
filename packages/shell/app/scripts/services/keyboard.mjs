@@ -46,7 +46,7 @@ export class Keyboard extends Map {
   on = (key, fn) => {
     key = key.toUpperCase()
     if (!(fn instanceof Function)) {
-      throw new TypeError(`Keyboard [on]: Second paramentr "${fn}" isn't a function`)
+      throw new TypeError(`Keyboard [on]: "${key}" "${fn}" isn't a function`)
     }
     fn = fn.bind(this.#subject)
     this.set(key, [...(this.get(key) ?? []), fn])

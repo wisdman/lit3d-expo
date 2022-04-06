@@ -38,6 +38,17 @@ export class FrameTexture {
     return cords
   }
 
+  set cords(value) {
+    const items = [...flatIterator(filterUndefined(value))]
+    const length = items.length
+    if (length !== FLAT_SIZE) {
+      throw new TypeError(`FrameTexture [constructor]: Size "${length}" not equal to ${FLAT_SIZE}`)
+    }
+    for (let i = 0; i < SIZE; i++) {
+      this[i] = [items[i * 2 + 0], items[i * 2 + 1]]
+    }
+  }
+
   get positions() {
     const cords = this.cords
     return [

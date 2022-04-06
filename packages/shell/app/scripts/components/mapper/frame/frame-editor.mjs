@@ -5,6 +5,8 @@ import { DEFAULT_RESOLUTION } from "/common/entities/constants.mjs"
 import { TextureEditor } from "../texture/texture-editor.mjs"
 import { MaskTexture } from "../texture/texture.mjs"
 
+import { TextureDialog } from "./dialog-texture.mjs"
+
 import CSS from "./frame-editor.css" assert { type: "css" }
 
 const SVG_NAMESPACE = "http://www.w3.org/2000/svg"
@@ -34,6 +36,8 @@ export class FrameEditor extends HTMLElement {
     if (isActive) circle.classList.add("active")
     return circle
   }
+
+  #textureDialog = undefined
 
   #SHORTCUTS = {
     // Mapping mode
@@ -97,8 +101,6 @@ export class FrameEditor extends HTMLElement {
 
     [`[${MODE_FRAME}]ARROWDOWN`]: this.moveFrameDown,       // Move frame down
     [`[${MODE_FRAME}]SHIFT+ARROWDOWN`]: this.moveFrameDown, // Move frame down x10
-
-    [`[${MODE_FRAME}]ESCAPE`]: this.deselectFrame, // Deselect frame
 
     [`[${MODE_FRAME}]ESCAPE`]: this.deselectFrame, // Deselect frame
 
@@ -246,6 +248,7 @@ export class FrameEditor extends HTMLElement {
   }
   deleteFrame() {
     this.#frameList.delete(this.activeFrame)
+    this.activeFrame = undefined
     this.#render()
   }
 
@@ -268,7 +271,18 @@ export class FrameEditor extends HTMLElement {
   setTexture() { this.setTextureOrMask({ not: MaskTexture }) }
   setMask() { this.setTextureOrMask({ is: MaskTexture }) }
 
-  editTexture() { console.log("TODO: editTexture") }
+  async editTexture() {
+    if (this.#activeFrame === undefined) { return }
+    this.#keyboard.active = false
+    this.#textureDialog = this.#textureDialog ?? new TextureDialog()
+    const cords = await this.#textureDialog.modal()
+    if (cords !== undefined) { 
+      this.#activeFrame.texture.cords = cords
+      this.#render()
+    }
+    this.#keyboard.active = true
+  }
+
   editMask() { console.log("TODO: editTexture") }
 
   play() { this.#textureList.get(this.activeFrame.texture)?.play?.() }
