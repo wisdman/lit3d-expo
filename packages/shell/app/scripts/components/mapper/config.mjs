@@ -4,11 +4,12 @@ import { GetConfigMappingByID, SetConfigMappingByID } from "../../services/api.m
 import { Mapping } from "/common/entities/mapping.mjs"
 
 const INIT_CONFIG = await GetConfigMappingByID()
+const { left:x, top:y} = (await window.getScreenDetails()).currentScreen
 
 export class Config extends Mapping {
   constructor() {
     super(INIT_CONFIG)
-    console.dir(JSON.stringify(new Mapping(INIT_CONFIG)))
+    this.location = [x, y]
   }
 
   get raw() { return JSON.parse(JSON.stringify(this)) }

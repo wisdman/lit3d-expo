@@ -21,7 +21,7 @@ export class AppComponent extends HTMLElement {
       `resizable=yes`,
        `scrollbars=no`
     ].join(",")
-    return window.open(`mapping.html#${id}`, `mapping-${id}`, features)
+    return window.open(`full-screen.html#${id}`, `mapping-${id}`, features)
   }
 
   #config = new Content()
@@ -40,7 +40,7 @@ export class AppComponent extends HTMLElement {
     const screens = (await window.getScreenDetails()).screens
     for (const [i, {left, top}] of screens.entries()) {
       console.log(i, left, top)
-      const win = AppComponent.MappingWindow(i, left, top)
+      const win = AppComponent.MappingWindow(`${left}-${top}`, left, top)
       // console.log(win.document.body)
       // await win.document.body.requestFullscreen()
     }

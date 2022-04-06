@@ -108,8 +108,9 @@ func (c *Core) WriteContentConfig() error {
     return fmt.Errorf("Core [WriteContentConfig]: Config file error: %+v", err)
   }
   defer file.Close()
-  err = json.NewEncoder(file).Encode(c.content)
-  if err != nil {
+  enc := json.NewEncoder(file)
+  enc.SetIndent("", "    ")
+  if err := enc.Encode(c.content); err != nil {
     log.Printf("Core [WriteContentConfig]: Config write error: %+v\n", err)
     return fmt.Errorf("Core [WriteContentConfig]: Config write error: %+v", err)
   }
