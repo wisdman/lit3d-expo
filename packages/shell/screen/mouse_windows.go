@@ -16,12 +16,6 @@ var (
 	procSetCursorPos = moduser32.NewProc("SetCursorPos")
 )
 
-func init() {
-	syscall.LazyDLL 
-}
-
-
-
 func MouseClick(x int32, y int32) {
 	procSetCursorPos.Call(uintptr(x), uintptr(y))
 	procMouse.Call(uintptr(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP), 0, 0, 0, 0)
