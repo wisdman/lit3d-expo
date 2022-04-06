@@ -11,7 +11,7 @@ export class FullScreen extends HTMLElement {
   }
 
   #fullscreen = async () => {
-    await new Promise(resolve => setTimeout(resolve, (MAPPING_ID ?? 0) * 1000))
+    await new Promise(resolve => setTimeout(resolve, Math.random()*1000))
     const screen = (await window.getScreenDetails()).currentScreen
     window.addEventListener("pointerdown", async () => {
       await document.body.requestFullscreen({ screen })
