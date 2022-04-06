@@ -1,53 +1,69 @@
-export class Keyboard {
+
+export class Keyboard extends Map {
+  static SHORTCUTS = Symbol("SHORTCUTS")
+
   static root(key, alt, ctrl, meta, shift) {
     return `${alt ? "alt+" : ""}${ctrl ? "ctrl+" : ""}${meta ? "meta+" : ""}${shift ? "shift+" : ""}${key}`.toUpperCase()
   }
 
-  #listeners = new Map()
+  static #listeners = []
+  static add(listener) { this.#listeners.unshift(listener) }
 
-  #active = false
-  get active() { return this.#active }
-  set active(value) {
-    this.#active = Boolean(value)
-    if (this.#active) {
-      window.addEventListener("keydown", this.#keyDown, { capture: true })
-    } else {
-      window.removeEventListener("keydown", this.#keyDown, { capture: true })
+  static #keyDown = (event) => {
+    const { key, altKey:alt, ctrlKey:ctrl, metaKey:meta, shiftKey:shift } = event
+    const root = this.root(key, alt, ctrl, meta, shift)
+    if (this.#listeners.length <= 0) { return }
+    for (const listener of this.#listeners) {
+      if (listener.call(root, { key, alt, ctrl, meta, shift })) {
+        event.preventDefault()
+        event.stopPropagation()
+        return
+      }
     }
   }
 
-  #keyDown = event => {
-    const { altKey:alt, ctrlKey:ctrl, metaKey:meta, shiftKey:shift } = event
-    const root = Keyboard.root(event.key, alt, ctrl, meta, shift)
-    const listeners = this.#listeners.get(root) ?? []
-    if (!listeners.length) return
-    event.preventDefault()
-    event.stopPropagation()
-    listeners.forEach(fn => fn({ alt, ctrl, meta, shift }))
+  static { window.addEventListener("keydown", this.#keyDown, { capture: true }) }
+
+  #isActive = Boolean()
+  get active() { return this.#isActive }
+  set active(isActive) { this.#isActive = Boolean(isActive) }
+
+  #mode = ""
+  get mode() { return this.#mode }
+  set mode(mode) { this.#mode = String(mode).replace(/\s+/ig,"") }
+
+  #subject = undefined
+
+  constructor(subject, shortcuts) {
+    super()
+    this.#subject = subject
+    this.#init(shortcuts)
+    Keyboard.add(this)
   }
+
+  #init = (fnList) => Object.entries(fnList).forEach(([key, fn]) => this.on(key, fn))
 
   on = (key, fn) => {
     key = key.toUpperCase()
-    this.#listeners.set(key, [...(this.#listeners.get(key) ?? []), fn])
+    if (!(fn instanceof Function)) {
+      throw new TypeError(`Keyboard [on]: Second paramentr "${fn}" isn't a function`)
+    }
+    fn = fn.bind(this.#subject)
+    this.set(key, [...(this.get(key) ?? []), fn])
   }
 
   off = (key, fn) => {
     key = key.toUpperCase()
-    const listeners = this.#listeners.get(root) ?? new Map()
-    if (!fn) { 
-      this.#listeners.delete(key)
-      return
-    }
-    this.#listeners.set(key, (this.#listeners.get(key) ?? []).filter(l => l !== fn))
+    this.set(key, (this.get(key) ?? []).filter(iFn => iFn !== fn))
   }
 
-  once = (key, fn) => {
-    const wrapper = () => {
-      this.off(key, wrapper)
-      fn()
-    }
-    this.on(key, wrapper)
+  call = (root, args) => {
+    const mode = this.#mode
+    const key = `${mode ? `[${mode}]` : ""}${root}`.toUpperCase()
+    if (!this.active) { return false }
+    const fnArr = this.get(key) ?? []
+    if (fnArr.length <= 0) { return false }
+    fnArr.forEach(fn => fn(args))
+    return true
   }
-
-  wait = (key) => new Promise(resolve => this.once(key, resolve))
 }

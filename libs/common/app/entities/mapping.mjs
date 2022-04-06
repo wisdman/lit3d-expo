@@ -1,9 +1,14 @@
 
+import { UInt8 } from "../types/numeric.mjs"
+
 import { flatIterator } from "../types/utils.mjs"
 import { Int16Vector2 } from "../types/vector.mjs"
 
 import { FrameList } from "./frame-list.mjs"
 import { TextureList } from "./texture-list.mjs"
+
+import { DEFAULT_FPS } from "./constants.mjs"
+
 
 export class Mapping {
   #id = ""
@@ -42,6 +47,10 @@ export class Mapping {
   get textures() { return this.#textures }
   set textures(textures) { this.#textures = new TextureList(textures) }
 
+  #fps = new UInt8(DEFAULT_FPS)
+  get fps() { return this.#fps.value }
+  set fps(fps) { this.#fps = new UInt8(fps) }
+
   #url = ""
   get url() { return this.#url }
   set url(url = "") { this.#url = String(url) }
@@ -68,6 +77,7 @@ export class Mapping {
     location: this.#location,
     ...(this.#frames.length ? {frames: this.#frames} : {}),
     ...(this.#textures.length ? {textures: this.#textures} : {}),
+    ...(this.#fps ? {fps:this.#fps} : {}),
     ...(this.#url ? { url: this.#url } : {} ),
     ...(this.#sync.length ? {sync: [...this.#sync] } : {}),
   }}

@@ -2,6 +2,7 @@ package core
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"path/filepath"
@@ -20,7 +21,47 @@ func (c *Core) GetConfigMapping() *[]common.Mapping {
     return &empty
   }
 
-  return c.content.Mapping
+  return &c.content.Mapping
+}
+
+// func (c *Core) SetConfigMapping(item *common.Mapping) error {
+//   if c.content.Mapping == nil {
+//     c.content.Mapping = &[]common.Mapping{*item}
+//     return nil
+//   }
+//   return nil
+// }
+
+func (c *Core) GetConfigMappingByID(id string) *common.Mapping {
+  if c.content.Mapping == nil {
+    return &common.Mapping{ Id: id }
+  }
+
+  for _, s := range c.content.Mapping {
+    if (s.Id == id) {
+      return &s
+    }
+  }
+  
+  return &common.Mapping{ Id: id }
+}
+
+func (c *Core) SetConfigMappingByID(item *common.Mapping) error {
+  if c.content.Mapping == nil {
+    c.content.Mapping = []common.Mapping{*item}
+    return c.WriteContentConfig()
+  }
+
+  for i, s := range c.content.Mapping {
+    if (s.Id == item.Id) {
+      c.content.Mapping[i] = *item
+      return c.WriteContentConfig()
+    }
+  }
+
+  c.content.Mapping = append(c.content.Mapping, *item)
+
+  return c.WriteContentConfig()
 }
 
 func (c *Core) GetConfigExec() *[]common.Exec {
@@ -29,7 +70,7 @@ func (c *Core) GetConfigExec() *[]common.Exec {
     return &empty
   }
 
-  return c.content.Exec
+  return &c.content.Exec
 }
 
 func (c *Core) GetConfigSound() *[]common.Sound {
@@ -38,7 +79,7 @@ func (c *Core) GetConfigSound() *[]common.Sound {
     return &empty
   }
 
-  return c.content.Sound
+  return &c.content.Sound
 }
 
 func (c *Core) ReadContentConfig() *common.Content {
@@ -58,6 +99,21 @@ func (c *Core) ReadContentConfig() *common.Content {
 
   c.content = contentConfig
   return c.content
+}
+
+func (c *Core) WriteContentConfig() error {
+  file, err := os.OpenFile(c.contentConfigPath, os.O_WRONLY|os.O_CREATE, 0644)
+  if err != nil {
+    log.Printf("Core [WriteContentConfig]: Config file error: %+v\n", err)
+    return fmt.Errorf("Core [WriteContentConfig]: Config file error: %+v", err)
+  }
+  defer file.Close()
+  err = json.NewEncoder(file).Encode(c.content)
+  if err != nil {
+    log.Printf("Core [WriteContentConfig]: Config write error: %+v\n", err)
+    return fmt.Errorf("Core [WriteContentConfig]: Config write error: %+v", err)
+  }
+  return nil
 }
 
 func (c *Core) ListContent() ([]string, error) {

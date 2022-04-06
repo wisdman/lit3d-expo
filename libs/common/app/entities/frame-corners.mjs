@@ -59,7 +59,6 @@ export class FrameCorners {
   constructor(...args) {
     const items = [...flatIterator(filterUndefined(args))]
     const length = items.length
-
     if (length === 0) { // Default Corners 
       return this
     }
@@ -69,7 +68,7 @@ export class FrameCorners {
     }
 
     for (let i = 0; i < SIZE; i++) {
-      this[i] = [items[0 * 2 + 0], items[0 * 2 + 1]]
+      this[i] = [items[i * 2 + 0], items[i * 2 + 1]]
     }
   }
 

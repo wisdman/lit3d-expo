@@ -1,7 +1,7 @@
 
 import { Content } from "/common/entities/content.mjs"
 
-import { ID, API_PATH_CONFIG } from "../../services/api.mjs"
+import { API_PATH_CONFIG } from "../../services/api.mjs"
 
 import { ConfigEditor } from "../config-editor/config-editor.mjs"
 

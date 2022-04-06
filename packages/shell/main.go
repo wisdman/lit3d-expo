@@ -51,6 +51,8 @@ func main() {
   api.GET("/config", api.GetConfig)
   api.GET("/config/exec", api.GetConfigExec)
   api.GET("/config/mapping", api.GetConfigMapping)
+  api.GET("/config/mapping/:id", api.GetConfigMappingByID)
+  api.POST("/config/mapping/:id", api.SetConfigMappingByID)
   api.GET("/config/sound", api.GetConfigSound)
   api.POST("/mouse/click", api.MouseClick)
 

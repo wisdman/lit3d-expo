@@ -1,0 +1,44 @@
+:host {
+  position: relative;
+  box-sizing: border-box;
+  justify-self: center;
+  align-self: center;
+
+  --gap: 32px;
+  width: calc(100% - var(--gap));
+  height: calc(100% - var(--gap));
+
+  --bg-color: rgb(36 41 47 / 1);
+  --bg-line-color: rgb(255 255 255 / .3);
+  --bg-size: 30px;
+
+  background-color: rgb(36 41 47 / 1);
+  background-image: repeating-linear-gradient(
+                      transparent, transparent calc(var(--bg-size) - 1px),
+                      var(--bg-line-color) calc(var(--bg-size) - 1px), var(--bg-line-color) var(--bg-size)
+                    ),
+                    repeating-linear-gradient(0.25turn,
+                      var(--bg-color), var(--bg-color) calc(var(--bg-size) - 1px),
+                      var(--bg-line-color) calc(var(--bg-size) - 1px), var(--bg-line-color) var(--bg-size)
+                    );
+  border-radius: 13px;
+
+  display: grid;
+  grid-template-columns: repeat(auto-fill, 384px);
+  gap: var(--gap);
+  padding: var(--gap);
+}
+
+.color, .mask, video, img {
+  display: grid;
+  box-sizing: content-box;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  border: 1px solid rgb(255 255 255 / 0.87);
+  justify-content: center;
+  align-content: center;
+}
+
+.active {
+  outline: thick double var(--active-color);
+}

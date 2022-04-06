@@ -47,6 +47,7 @@ export class Frame {
     this.size = size
     this.texture = texture
     this.mask = mask
+    this.corners = corners
   }
 
   toJSON() { return {

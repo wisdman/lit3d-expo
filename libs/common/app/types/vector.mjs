@@ -42,6 +42,10 @@ class Vector {
   }
 
   toJSON() { return [...this] }
+
+  forEach(fn) { return [...this].forEach(fn) }
+  map(fn) { return [...this].map(fn) }
+  reduce(fn, acc) { return [...this].reduce(fn, acc) }
 }
 
 class Vector2 extends Vector {  

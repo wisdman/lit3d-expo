@@ -5,9 +5,9 @@ type Content struct {
   Title       string `json:"title"`
   Description string `json:"description"`
   
-  Exec    *[]Exec    `json:"exec,omitempty"`
-  Mapping *[]Mapping `json:"mapping,omitempty"`
-  Sound   *[]Sound   `json:"sound,omitempty"`
+  Exec    []Exec    `json:"exec,omitempty"`
+  Mapping []Mapping `json:"mapping,omitempty"`
+  Sound   []Sound   `json:"sound,omitempty"`
 }
 
 type Exec struct {
@@ -25,8 +25,9 @@ type Mapping struct {
 
   Location [2]int16   `json:"location"`
 
-  Frames   *[]Frame   `json:"frames,omitempty"`
-  Textures *[]Texture `json:"textures,omitempty"`
+  Frames   []Frame   `json:"frames,omitempty"`
+  Textures []Texture `json:"textures,omitempty"`
+  FPS      *uint8    `json:"fps,omitempty"`
 
   URL *string         `json:"url,omitempty"`
   
@@ -39,8 +40,8 @@ type Frame struct {
   Size    [2]uint16  `json:"size"`
   Corners [8]int16   `json:"corners"`
   
-  Texture [5]float32 `json:"texture,omitempty"`
-  Mask    [5]float32 `json:"mask,omitempty"`
+  Texture [9]float32 `json:"texture,omitempty"`
+  Mask    [9]float32 `json:"mask,omitempty"`
 }
 
 type Texture struct {
@@ -48,6 +49,7 @@ type Texture struct {
 
   URL    *string    `json:"url,omitempty"`
   Volume *uint8     `json:"volume,omitempty"`
+  Loop   *bool      `json:"loop,omitempty"`
 
   Color *[2]uint8   `json:"color,omitempty"`
 

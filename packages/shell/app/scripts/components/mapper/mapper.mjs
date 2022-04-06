@@ -1,16 +1,17 @@
 
 import { Keyboard } from "../../services/keyboard.mjs"
-import { MAPPING_ID, API_PATH_MOUSE_CLICK } from "../../services/api.mjs"
+import { Config } from "./config.mjs"
 
 import { ViewProjectionMatrix } from "/common/math/projection.mjs"
 import { ProcessVectorArray } from "/common/math/process.mjs"
 
-import { DEFAULT_RESOLUTION, DEFAULT_FPS, VERTEX_SIZE, TEXTCORD_SIZE, VERTEX_COUNT, DEFAULT_SCREEN_LOACTION } from "./constants.mjs"
+import { DEFAULT_RESOLUTION, VERTEX_SIZE, TEXTCORD_SIZE, VERTEX_COUNT, DEFAULT_FPS } from "/common/entities/constants.mjs"
 
-import { FrameList } from "/common/entities/frame-list.mjs"
-import { Editor as FrameEditor } from "./frame/editor.mjs"
+import { FrameList } from "./frame/frame-list.mjs"
+import { FrameEditor } from "./frame/frame-editor.mjs" 
 
-import { List as TextureList } from "./texture/list.mjs"
+import { TextureList } from "./texture/texture-list.mjs"
+import { TextureEditor } from "./texture/texture-editor.mjs"
 
 import CSS from "./mapper.css" assert { type: "css" }
 
@@ -31,7 +32,16 @@ export class Mapper extends HTMLElement {
     powerPreference: "high-performance",
   }
 
-  #location = [...DEFAULT_SCREEN_LOACTION]
+  #SHORTCUTS = {
+    "M": this.openFrameEditor,   // Open frames editor
+    "T": this.openTextureEditor, // Open texture editor
+    
+    "P": this.play,        // Play content
+    "SHIFT+P": this.pause, // Pause content
+
+    "CTRL+S": this.save
+  }
+  #keyboard = new Keyboard(this, this.#SHORTCUTS)
 
   #devicePixelRatio = 1
   #fps = DEFAULT_FPS
@@ -50,24 +60,25 @@ export class Mapper extends HTMLElement {
   #positionBuffer = this.#gl.createBuffer()
   #texcoordBuffer = this.#gl.createBuffer()
 
-  #frameList = new FrameList()
-  #textureList = new TextureList(this.#gl)
-  #renderFrames = []
+  #config = new Config()
+  // #frameList = new FrameList()
+  #frameList = new FrameList(this.#config.raw?.frames)
+  // #textureList = new TextureList(this.#gl)
+  #textureList = new TextureList(this.#gl, this.#config.raw?.textures)
+
+  #frameEditor = undefined
+  #textureEditor = undefined
+  
+  #textureIds = []
 
   #viewProjectionMatrix = ViewProjectionMatrix(...DEFAULT_RESOLUTION)
   #resizeObserver = undefined
 
-  #keyboard = new Keyboard()
-
-  #config = {}
-
-  constructor(config = {}) {
+  constructor() {
     super()
-    this.#config = config
     this.shadowRoot.adoptedStyleSheets = [CSS]
     this.#initProgramm()
     this.#initGeometry()
-    this.#initKeyboard()
   }
 
   #createShader = (source, type) => {
@@ -133,7 +144,7 @@ export class Mapper extends HTMLElement {
   }
 
   #updateGeometry = () => {
-    const { dstPositions, dstTextureCoords, frames } = this.#frameList
+    const { dstPositions, dstTextureCoords, textureIds } = this.#frameList
     const aPositions = ProcessVectorArray(this.#viewProjectionMatrix, dstPositions)
 
     this.#gl.bindVertexArray(this.#vertexArray)
@@ -144,7 +155,7 @@ export class Mapper extends HTMLElement {
     this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#texcoordBuffer)
     this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(dstTextureCoords), this.#gl.STATIC_DRAW)
 
-    this.#renderFrames = frames
+    this.#textureIds = textureIds
   }
 
   #onCanvasResize = ([{contentRect: {width, height}}]) => {
@@ -169,7 +180,7 @@ export class Mapper extends HTMLElement {
     this.#gl.useProgram(this.#program)
     this.#gl.bindVertexArray(this.#vertexArray)
     
-    for (const [i, [texId, maskId]] of this.#renderFrames.entries()) {
+    for (const [i, [texId, maskId]] of this.#textureIds.entries()) {
       this.#gl.uniform1i(this.#textureUniformLocation, texId)
       this.#gl.drawArrays(this.#gl.TRIANGLES, i * VERTEX_COUNT, VERTEX_COUNT)
     }
@@ -177,88 +188,50 @@ export class Mapper extends HTMLElement {
     setTimeout(() => requestAnimationFrame(this.#render), 1000 / this.#fps - 16)
   }
 
-  #parseConfig = () => {
-
+  async openFrameEditor() {
+    this.#keyboard.active = false
+    const width = this.#gl.canvas.width
+    const height = this.#gl.canvas.height
+    this.#frameEditor = this.#frameEditor ?? new FrameEditor(this.#frameList, this.#textureList, [width, height])
+    this.#frameEditor.addEventListener("render", this.#updateGeometry)
+    await this.shadowRoot.appendChild(this.#frameEditor).modal()
+    this.#frameEditor.removeEventListener("render", this.#updateGeometry)
+    this.shadowRoot.removeChild(this.#frameEditor)
+    this.#keyboard.active = true
   }
 
-
-  #fullscreen = async () => {
-    await new Promise(resolve => setTimeout(resolve, MAPPING_ID * 1000))
-    const screen = (await window.getScreenDetails()).currentScreen
-
-    window.addEventListener("pointerdown", async () => {
-      await document.body.requestFullscreen({ screen })
-    }, { once: true, capture: true })
-    
-    const { left, top } = screen
-    await this.#mouseClick(left + 200, top + 200)
+  async openTextureEditor() {
+    this.#keyboard.active = false
+    this.#textureEditor = this.#textureEditor ?? new TextureEditor(this.#textureList)
+    await this.shadowRoot.appendChild(this.#textureEditor).modal()
+    this.shadowRoot.removeChild(this.#textureEditor)
+    this.#keyboard.active = true
   }
 
-  #mouseClick = async (x, y) => {
-    const rawResponse = await fetch(API_PATH_MOUSE_CLICK, {
-      method: "POST",
-      headers: {
-        "Accept": "application/json",
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({x, y})
-    })
-    
+  play() { this.#textureList.play() }
+  pause() { this.#textureList.pause() }
+
+  save() { 
+    this.#config.frames = this.#frameList
+    this.#config.textures = this.#textureList
+    this.#config.save()
   }
 
   async connectedCallback() {
     this.#resizeObserver = new ResizeObserver(this.#onCanvasResize)
     this.#resizeObserver.observe(this.#gl.canvas)
-
-    this.#parseConfig(this.#config)
-
-    // this.#frameList.addEventListener("change", this.#updateGeometry)
     this.#updateGeometry()
-
-    await this.#fullscreen()
-
     requestAnimationFrame(this.#render)
-
-    this.paused = false
+    this.#textureList.play()
     this.#keyboard.active = true
-
-
   }
 
   disconnectedCallback() {
-    this.paused = true
-
+    this.#keyboard.active = false
+    this.#textureList.pause()
     this.#resizeObserver.disconnect()
     this.#resizeObserver = undefined
-    this.#keyboard.active = false
-
-    // this.#frameList.removeEventListener("change", this.#updateGeometry)
   }
-
-  #initKeyboard = () => {
-    this.#keyboard.on("M", this.#onMKey) // Mapper mode
-    this.#keyboard.on("P", this.#onPKey) // Play cintent (Shift pause)
-  }
-
-  #onMKey = async () => {
-    this.#keyboard.active = false
-    const width = this.#gl.canvas.width
-    const height = this.#gl.canvas.height
-    const frameEditor = new FrameEditor(this.#frameList, this.#textureList, [width, height])
-    frameEditor.addEventListener("render", this.#updateGeometry)
-    await this.shadowRoot.appendChild(frameEditor).wait()
-    frameEditor.removeEventListener("render", this.#updateGeometry)
-    this.shadowRoot.removeChild(frameEditor)
-    this.#keyboard.active = true
-  }
-
-  #onPKey = ({shift}) => shift ? this.#textureList.pause() : this.#textureList.play()
-
-  toJSON = () => ({
-    location: this.#location,
-    frames: this.#frameList,
-    textures: this.#textureList,
-  })
 }
 
 customElements.define("ss-mapper", Mapper)

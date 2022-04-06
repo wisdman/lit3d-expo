@@ -29,4 +29,10 @@ export class List extends Set {
   }
 
   toJSON() { return [...this] }
+
+  forEach(fn) { return [...this].forEach(fn) }
+  map(fn) { return [...this].map(fn) }
+  reduce(fn, acc) { return [...this].reduce(fn, acc) }
+
+  find(fn) { return [...this].find(fn) }
 }

@@ -74,9 +74,9 @@ export class FrameTexture {
 
     this.id = id
     for (let i = 0; i < SIZE; i++) {
-      this[i] = [items[0 * 2 + 0], items[0 * 2 + 1]]
+      this[i] = [items[i * 2 + 0], items[i * 2 + 1]]
     }
   }
 
-  toJSON() { return [this.id, ...this] }
+  toJSON() { return [...this] }
 }

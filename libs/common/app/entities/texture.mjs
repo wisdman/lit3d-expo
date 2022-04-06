@@ -11,9 +11,6 @@ export class Texture {
   set id(id) { this.#id = new UInt8(id) }  
 
   constructor(args = {}) {
-    if (UrlTexture.isUrlTexture(args)) return new UrlTexture(args)
-    if (MaskTexture.isMaskTexture(args)) return new MaskTexture(args)
-    if (ColorTexture.isColorTexture(args)) return new ColorTexture(args)
     const { id } = args
     this.id = id
   }
@@ -23,38 +20,27 @@ export class Texture {
   }}
 }
 
-export class UrlTexture extends Texture {
-  static isUrlTexture = ({ url } = {}) => url !== undefined
-  
-  #url = ""
-  get url() { return this.#url }
-  set url(url) { this.#url = String(url) }
+export class ColorTexture extends Texture {
+  static isThisTexture({ color } = {}) { return color !== undefined }
 
-  #volume = new UInt8()
-  get volume() { return this.#volume.value }
-  set volume(volume) {
-    const v = new UInt8(volume)
-    if (v.value > MAX_VIOLUME)
-      throw new TypeError(`Texture [set volume]: Volume "${v}" out of range [${0}..${MAX_VIOLUME}]`)
-    this.#volume = v
-  }
-  get muted() { return this.#volume.value === 0 }
+  #color = new UInt8Vector3()
+  get color() { return this.#color }
+  set color(color) { this.#color = new UInt8Vector3(color) }
 
-  constructor({ url, volume, ...args } = {}) {
+  constructor({ color, ...args } = {}) {
     super(args)
-    this.url = url
-    this.volume = volume
+    this.color = color
   }
 
-  toJSON() { return {
+  toJSON() { 
+    return {
     ...(super.toJSON()),
-    url: this.url,
-    volume: this.volume,
+    color: this.#color,
   }}
 }
 
 export class MaskTexture extends Texture {
-  static isMaskTexture = ({ mask } = {}) => mask !== undefined
+  static isThisTexture({ mask } = {}) { return mask !== undefined }
 
   #mask = new TextureMask()
   get mask() { return this.#mask }
@@ -71,21 +57,38 @@ export class MaskTexture extends Texture {
   }}
 }
 
-export class ColorTexture extends Texture {
-  static isColorTexture = ({ color } = {}) => color !== undefined
+export class UrlTexture extends Texture {
+  static isThisTexture({ url } = {}) { return url !== undefined }
+  
+  #url = ""
+  get url() { return this.#url }
+  set url(url) { this.#url = String(url) }
 
-  #color = new UInt8Vector3()
-  get color() { return this.#color }
-  set color(color) { this.#color = new UInt8Vector3(color) }
+  #volume = new UInt8()
+  get volume() { return this.#volume.value }
+  set volume(volume) {
+    const v = new UInt8(volume)
+    if (v.value > MAX_VIOLUME)
+      throw new TypeError(`Texture [set volume]: Volume "${v}" out of range [${0}..${MAX_VIOLUME}]`)
+    this.#volume = v
+  }
+  get muted() { return this.#volume.value === 0 }
 
-  constructor({ color, ...args } = {}) {
+  #loop = Boolean(true)
+  get loop() { return this.#loop }
+  set loop(loop) { this.#loop = Boolean(loop) }
+
+  constructor({ url, volume, loop, ...args } = {}) {
     super(args)
-    this.color = color
+    this.url = url
+    this.volume = volume
+    this.loop = loop
   }
 
-  toJSON() { 
-    return {
+  toJSON() { return {
     ...(super.toJSON()),
-    color: this.#color,
+    url: this.url,
+    volume: this.volume,
+    loop: this.loop,
   }}
 }
