@@ -1,71 +1,44 @@
 package main
 
 import (
-	"flag"
 	"fmt"
-
 	"log"
-	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
 
-	"github.com/wisdman/lit3d-expo/libs/service"
-
-	"github.com/wisdman/lit3d-expo/packages/shell/api"
-	"github.com/wisdman/lit3d-expo/packages/shell/core"
+	"github.com/wisdman/lit3d-expo/packages/shell/chromium"
+	// "github.com/wisdman/lit3d-expo/packages/shell/winapi"
 )
 
 var revision = "unknown"
 
 func main() {
   fmt.Printf("Lit3D-shell %s\n", revision)
+  log.Printf("Temp: %s\n", os.TempDir())
 
-  var configStr string
-  flag.StringVar(&configStr, "cfg", "", "Custom config JSON")
-  debug := flag.Bool("d", false, "Print log to stdout")
-  flag.Parse()
-
-  if *debug != true {
-    logPath := getLogFilePath()
-    logFile, err := os.OpenFile(logPath, os.O_RDWR | os.O_CREATE | os.O_APPEND, 0666)
-    if err != nil {
-      log.Fatalf("Opening log file error: %+v\n", err)
-    }
-    defer logFile.Close()
-    log.SetOutput(logFile)
+  browser, err := chromium.New(os.TempDir())
+  if err != nil {
+   log.Fatalf("Browser initialization error: %+v", err)
+  }
+  
+  err = browser.Init()
+  if err != nil {
+   log.Fatalf("Browser init error: %+v", err)
   }
 
-  config := NewConfig(configStr)
-  config.Print()
 
-  core := core.New(config.GetID(), config.ContentPath)
-  core.Print()
+  // processes, err := winapi.EnumProcesses()
+  // if err != nil {
+  //   log.Fatalf("Chromium [GetWindows] Win API error: %+v", err) 
+  // }
 
-  srv := service.New(config.SSLCert, config.SSLKey)
+  // binary := strings.ToLower("chrome.exe")
+  // cPids := []uint32{}
+  // for _, p := range processes {
+  //   if strings.ToLower(p.ExeFile()) == binary {
+  //     cPids = append(cPids, p.ProcessID)
+  //   }
+  // }
 
-  api := &api.API{ srv.API("/api"), core}
-  api.GET("/id", api.GetID)
-  api.GET("/theme", api.GetTheme)
-  api.GET("/content", api.ListContent)
-  api.GET("/config", api.GetConfig)
-  api.GET("/config/exec", api.GetConfigExec)
-  api.GET("/config/mapping", api.GetConfigMapping)
-  api.GET("/config/mapping/:id", api.GetConfigMappingByID)
-  api.POST("/config/mapping/:id", api.SetConfigMappingByID)
-  api.GET("/config/sound", api.GetConfigSound)
-  api.POST("/mouse/click", api.MouseClick)
+  // log.Println(cPids)
 
-  srv.FS("/", http.FileServer(config.GetAppFS()))
-  srv.FS("/common/", http.StripPrefix("/common/", http.FileServer(config.GetCommonFS())))
-  srv.FS("/content/", http.StripPrefix("/content/", http.FileServer(config.GetContentFS())))
-
-  srv.ListenAndServe()
-  core.Run()
-
-  stop := make(chan os.Signal, 1)
-  signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
-  <-stop
-
-  // srv.Shutdown()
 }

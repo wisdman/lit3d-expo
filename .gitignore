@@ -26,13 +26,9 @@ node_modules/
 /build/*
 !/build/.gitkeep
 
-### Chromium Embedded directory ###
-/chromium
-!/chromium/.gitkeep
-
-### Chromium data directory ###
-/chromium-data/*
-!/chromium-data/.gitkeep
+### Chromium Embedded file ###
+/packages/shell/chromium/chromium-*.zip
+/packages/shell-2/chromium/chromium-*.zip
 
 ### Content directory ###
 /content/*
