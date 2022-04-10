@@ -11,7 +11,7 @@ case "$1" in
     eval 'go run -mod=vendor ./packages/server -cert="./ssl/server.crt" -key="./ssl/server.key"'
     ;;
   shell)
-    eval 'go run -mod=vendor ./packages/shell -cfg="{ \"app\":\"./packages/shell/app\", \"common\":\"./libs/common/app\" }" -d ${@:2}'
+    eval 'go run -mod=vendor ./packages/shell -cfg="{ \"app\":\"./packages/shell/app\", \"common\":\"./libs/common/app\" }" -v ${@:2}'
     ;;
   *)
     echo "Error first argument" >&2

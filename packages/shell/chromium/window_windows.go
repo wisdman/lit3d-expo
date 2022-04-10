@@ -29,16 +29,19 @@ func (w *Window) Close() {
 	winapi.WindowCloseMessage(w.HWND)
 }
 
-func (w *Window) SendF11Key(name string) error {
-	log.Printf("Chromium [SendF11Key] Windows OS not supported yet\n")
-	return nil
+func (w *Window) SendKeyPress(key uint16) {
+	winapi.SendKeyPressInput(key)
+}
+
+func (w *Window) SetForeground() {
+	winapi.SetForegroundWindow(w.HWND)
 }
 
 
 func (c *Chromium) GetWindows() (*[]Window, error) {
 	processes, err := winapi.EnumProcesses()
 	if err != nil {
-		return nil, fmt.Errorf("Chromium [GetWindows] Win API error: %+v", err) 
+		return nil, fmt.Errorf("Chromium [GetWindows] Win API error: %w", err) 
 	}
 
 	binary := strings.ToLower(c.binary)
@@ -65,7 +68,7 @@ func (c *Chromium) GetWindows() (*[]Window, error) {
     0,
   )
   if err != nil {
-     return nil, fmt.Errorf("Chromium [GetWindows] Win API error: %+v", err) 
+     return nil, fmt.Errorf("Chromium [GetWindows] Win API error: %w", err) 
   }
 
 	return &windows, nil

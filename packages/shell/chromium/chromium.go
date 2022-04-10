@@ -33,22 +33,22 @@ func New(baseDir string) (*Chromium, error) {
 
   absPath, err := filepath.Abs(filepath.Join(baseDir, chromiumPath))
   if err != nil {
-    return nil, fmt.Errorf("Chromium [New] Incorrect path: %+v", err)
+    return nil, fmt.Errorf("Chromium [New] Incorrect path: %w", err)
   }
 
   absBinaryPath, err := filepath.Abs(filepath.Join(baseDir, chromiumBinaryPath))
   if err != nil {
-    return nil, fmt.Errorf("Chromium [New] Incorrect binary path: %+v", err)
+    return nil, fmt.Errorf("Chromium [New] Incorrect binary path: %w", err)
   }
 
   absDataPath, err := filepath.Abs(filepath.Join(baseDir, chromiumDataPath))
   if err != nil {
-    return nil, fmt.Errorf("Chromium [New] Incorrect data path: %+v", err)
+    return nil, fmt.Errorf("Chromium [New] Incorrect data path: %w", err)
   }
 
   absProfilePath, err := filepath.Abs(filepath.Join(baseDir, chromiumProfilePath))
   if err != nil {
-    return nil, fmt.Errorf("Chromium [New] Incorrect profile path: %+v", err)
+    return nil, fmt.Errorf("Chromium [New] Incorrect profile path: %w", err)
   }
 
   c := &Chromium{

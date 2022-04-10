@@ -22,7 +22,7 @@ func (c *Chromium) Extract() error {
   b := bytes.NewReader(chromiumZipBytes)
   archive, err := zip.NewReader(b, int64(b.Len()))
   if err != nil {
-    return fmt.Errorf("Chromium [Extract] Zip reader error: %+v", err)
+    return fmt.Errorf("Chromium [Extract] Zip reader error: %w", err)
   }
 
   for _, f := range archive.File {
@@ -33,26 +33,26 @@ func (c *Chromium) Extract() error {
       log.Printf("Chromium [Extract] Creating directory \"%s\"\n", filePath)
       err := os.MkdirAll(filePath, os.ModePerm)
       if err != nil {
-        return fmt.Errorf("Chromium [Extract] Creating directory error: %+v", err)
+        return fmt.Errorf("Chromium [Extract] Creating directory error: %w", err)
       }
       continue
     }
 
     dstFile, err := os.OpenFile(filePath, os.O_WRONLY|os.O_CREATE|os.O_TRUNC, f.Mode())
     if err != nil {
-      return fmt.Errorf("Chromium [Extract] Open fs file error: %+v", err)
+      return fmt.Errorf("Chromium [Extract] Open fs file error: %w", err)
     }
 
     fileInArchive, err := f.Open()
     if err != nil {
       dstFile.Close()
-      return fmt.Errorf("Chromium [Extract] Open archive file error: %+v", err)
+      return fmt.Errorf("Chromium [Extract] Open archive file error: %w", err)
     }
 
     if _, err := io.Copy(dstFile, fileInArchive); err != nil {
       dstFile.Close()
       fileInArchive.Close()
-      return fmt.Errorf("Chromium [Extract] Data copy error: %+v", err)
+      return fmt.Errorf("Chromium [Extract] Data copy error: %w", err)
     }
 
     dstFile.Close()

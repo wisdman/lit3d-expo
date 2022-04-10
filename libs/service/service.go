@@ -3,6 +3,7 @@ package service
 import (
 	"context"
 	"crypto/tls"
+	"fmt"
 	"log"
 	"net/http"
 	"path/filepath"
@@ -16,7 +17,7 @@ type Service struct {
 	keyFile  string
 }
 
-func New(certFile, keyFile string) *Service {
+func New(port uint32, certFile, keyFile string) *Service {
 	certFile, err := filepath.Abs(certFile)
 	if err != nil {
 		log.Fatalf("Incorrect certFile path: %v\n", err)
@@ -44,7 +45,7 @@ func New(certFile, keyFile string) *Service {
   }
 
 	service.server = &http.Server{
-		Addr: ":443",
+		Addr: fmt.Sprintf(":%d", port),
 		Handler: service.mux,
 		TLSConfig: tlsConfig,
 	}

@@ -6,6 +6,7 @@ type Content struct {
   Description string `json:"description"`
   
   Exec    []Exec    `json:"exec,omitempty"`
+  Kiosk   []Kiosk   `json:"exec,omitempty"`
   Mapping []Mapping `json:"mapping,omitempty"`
   Sound   []Sound   `json:"sound,omitempty"`
 }
@@ -18,20 +19,32 @@ type Exec struct {
   Command     string `json:"command"`
 }
 
-type Mapping struct {
-  Id          string  `json:"id"`
-  Title       string  `json:"title"`
-  Description string  `json:"description"`
+type Kiosk struct {
+  Id          string `json:"id"`
+  Title       string `json:"title"`
+  Description string `json:"description"`
 
-  Location [2]int16   `json:"location"`
+  Location [2]int16  `json:"location"`
+
+  URL *string        `json:"url,omitempty"`
+
+  Sync *[]string     `json:"sync,omitempty"`
+}
+
+type Mapping struct {
+  Id          string `json:"id"`
+  Title       string `json:"title"`
+  Description string `json:"description"`
+
+  Location [2]int16  `json:"location"`
 
   Frames   []Frame   `json:"frames,omitempty"`
   Textures []Texture `json:"textures,omitempty"`
   FPS      *uint8    `json:"fps,omitempty"`
 
-  URL *string         `json:"url,omitempty"`
+  URL *string        `json:"url,omitempty"`
   
-  Sync *[]string      `json:"sync,omitempty"`
+  Sync *[]string     `json:"sync,omitempty"`
 }
 
 type Frame struct {

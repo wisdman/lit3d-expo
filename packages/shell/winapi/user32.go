@@ -4,6 +4,7 @@ package winapi
 
 import (
 	"fmt"
+	"log"
 	"syscall"
 	"unsafe"
 )
@@ -18,7 +19,10 @@ var (
 	procGetWindowTextLength      = modUser32.NewProc("GetWindowTextLengthW")
 	procGetWindowThreadProcessId = modUser32.NewProc("GetWindowThreadProcessId")
 	procIsWindowVisible          = modUser32.NewProc("IsWindowVisible")
+	procMapVirtualKey 					 = modUser32.NewProc("MapVirtualKeyA")
+	procSendInput                = modUser32.NewProc("SendInput")
 	procSendMessage              = modUser32.NewProc("SendMessageW")
+	procSetForegroundWindow      = modUser32.NewProc("SetForegroundWindow")
 )
 
 func EnumWindows(callback func(hWnd HWND, lparam uintptr) bool, lparam uintptr) error {
@@ -83,6 +87,41 @@ func IsWindowVisible(hWnd HWND) bool {
 
 func SendMessage(hWnd HWND, msg uint32, wParam uintptr, lParam uintptr) uintptr {
 	ret, _, _ := procSendMessage.Call(uintptr(hWnd), uintptr(msg), wParam, lParam)
+	return ret
+}
+
+func SendKeyPressInput(wVk uint16) bool {
+	type KeyboardInput struct {
+		wVk         uint16
+		wScan       uint16
+		dwFlags     uint32
+		time        uint32
+		dwExtraInfo uint64
+	}
+
+	type Input struct {
+		inputType uint32
+		ki        KeyboardInput
+		padding   uint64
+	}
+
+	var input Input
+	input.inputType = INPUT_KEYBOARD
+	input.ki.wVk = wVk
+	wScan, _, _ := procMapVirtualKey.Call(uintptr(wVk), uintptr(0))
+	input.ki.wScan = wScan
+	input.ki.dwFlags = 0
+	ret, _, err := procSendInput.Call(
+		uintptr(1),
+		unsafe.Pointer(&input),
+		uintptr(unsafe.Sizeof(input)),
+	)
+	log.Printf("ret: %v error: %v", ret, err)
+	return true
+}
+
+func SetForegroundWindow(hWnd HWND) uintptr {
+	ret, _, _ := procSetForegroundWindow.Call(uintptr(hWnd))
 	return ret
 }
 

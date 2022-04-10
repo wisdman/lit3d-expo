@@ -2,19 +2,48 @@
 
 package chromium
 
-import "log"
+import (
+	"log"
+	"time"
+)
 
-func CloseWindow(name string) error {
-	log.Printf("Chromium [CloseWindow] Linux OS not supported yet\n")
-	return nil
+type Window struct {
+	Title string
 }
 
-func SendF11Key(name string) error {
-	log.Printf("Chromium [SendF11Key] Linux OS not supported yet\n")
-	return nil
+func (w *Window) Visible() bool {
+	log.Printf("Chromium [Window.Visible] Linux OS not supported yet\n")
+	return true
 }
 
-func GetWindows() error {
+func (w *Window) Main() bool {
+	log.Printf("Chromium [Window.Main] Linux OS not supported yet\n")
+	return true
+}
+
+func (w *Window) Close() {
+	log.Printf("Chromium [Window.Close] Linux OS not supported yet\n")
+}
+
+func (w *Window) SendKeyPress(_ uint16) {
+	log.Printf("Chromium [Window.SendF11Key] Linux OS not supported\n")
+}
+
+func (w *Window) SetForeground() {
+	log.Printf("Chromium [Window.SetForeground] Linux OS not supported\n")
+}
+
+func (c *Chromium) GetWindows() (*[]Window, error) {
 	log.Printf("Chromium [GetWindows] Linux OS not supported yet\n")
-	return nil
+	return nil, nil
+}
+
+func (c *Chromium) WaitWindows(timeout time.Duration) (*[]Window, error) {
+	log.Printf("Chromium [WaitWindows] Linux OS not supported yet\n")
+	return nil, nil
+}
+
+func (c *Chromium) WaitMainWindow(timeout time.Duration) (*Window, error) {
+	log.Printf("Chromium [WaitMainWindow] Linux OS not supported yet\n")
+	return nil, nil
 }
