@@ -1,17 +1,19 @@
 
 export const SELF_SERVER = window.location.origin
 
-const INSTANCE = Symbol["INSTANCE"]
 const WINDOW_ID_RX = /^(?:\s*\[(?<id>[^\]]+)\])?(?<title>.*)/i
 
+const INSTANCE = Symbol["INSTANCE"]
+
 export class API {
-  static [INSTANCE] = await new API()
+  static get instance() { return this[INSTANCE] ?? undefined }
+  static { this[INSTANCE] = new API() }
 
   static SERVER             = window.location.origin
   static API                = `${this.SERVER}/api`
   static API_ID             = `${this.API}/id`
   static API_CONFIG         = `${this.API}/config`
-  static API_CONFIG_MAPPING = `${API_CONFIG}/mapping`
+  static API_CONFIG_MAPPING = `${this.API_CONFIG}/mapping`
   static API_CONTENT        = `${this.API}/content`
   static API_CHROME_KEY     = `${this.API}/chrome/key`
 
@@ -36,19 +38,15 @@ export class API {
   #setDocumentTitle = (id, title) => document.title = `${id ? `[${id}]` : ""}${title}`
 
   GetWindowID() { return WINDOW_ID_RX.exec(document.title)?.groups?.id?.trim() ?? "" }
-  SetWindowID(id) { this.#setDocumentTitle(id, this.WindowTitle)  }
+  SetWindowID(id) { this.#setDocumentTitle(id, this.GetWindowTitle())  }
 
   GetWindowTitle() { return WINDOW_ID_RX.exec(document.title)?.groups?.title?.trim() ?? "" }
-  SetWindowTitle(title) { this.#setDocumentTitle(this.WindowID, title) }
+  SetWindowTitle(title) { this.#setDocumentTitle(this.GetWindowID(), title) }
 
-  ChromeKeyPress(windowId, key) { 
-    if (typeof key !== "string") {
-      throw TypeError(`API [WindowKeyPress] Key "${id}" isn't string value`)
+  async ChromeKeyPress(windowId, key) { 
+    if (typeof key !== "number") {
+      throw TypeError(`API [WindowKeyPress] Key "${key}" isn't number value`)
     }
-
-    if (id.length === 0) {
-      throw TypeError(`API [WindowKeyPress] Key "${id}" is an empty string`)
-    } 
 
     try {
       await fetch(this.class.API_CHROME_KEY, {

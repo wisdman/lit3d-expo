@@ -13,13 +13,22 @@ const (
 	TH32CS_SNAPPROCESS = 0x00000002
 
 	GW_OWNER = 4
+	GW_HWNDNEXT = 2
 
 	WM_SYSCOMMAND = 0x0112
+	WM_KEYDOWN    = 0x0100
+	WM_KEYUP      = 0x0101
+
+	MOUSEEVENTF_LEFTDOWN = 0x0002
+	MOUSEEVENTF_LEFTUP = 0x0004
 
 	SC_CLOSE = 0xF060
+	SW_RESTORE = 9
 
 	INPUT_KEYBOARD = 1
 	KEYEVENTF_KEYUP = 0x0002
+
+	VK_F11 = 0x7A
 )
 
 type PROCESSENTRY32 struct {
@@ -37,4 +46,11 @@ type PROCESSENTRY32 struct {
 
 func (p *PROCESSENTRY32) ExeFile() string {
 	return syscall.UTF16ToString(p.szExeFile[:MAX_PATH])
+}
+
+type RECT struct {
+	Left   int32
+	Top    int32
+	Right  int32
+	Bottom int32
 }

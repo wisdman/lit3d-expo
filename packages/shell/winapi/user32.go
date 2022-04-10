@@ -4,8 +4,8 @@ package winapi
 
 import (
 	"fmt"
-	"log"
 	"syscall"
+	"time"
 	"unsafe"
 )
 
@@ -15,14 +15,14 @@ var (
 	
 	procEnumWindows 				     = modUser32.NewProc("EnumWindows")
 	procGetWindow                = modUser32.NewProc("GetWindow")
+	procGetWindowRect            = modUser32.NewProc("GetWindowRect")
 	procGetWindowText            = modUser32.NewProc("GetWindowTextW")
 	procGetWindowTextLength      = modUser32.NewProc("GetWindowTextLengthW")
 	procGetWindowThreadProcessId = modUser32.NewProc("GetWindowThreadProcessId")
 	procIsWindowVisible          = modUser32.NewProc("IsWindowVisible")
-	procMapVirtualKey 					 = modUser32.NewProc("MapVirtualKeyA")
-	procSendInput                = modUser32.NewProc("SendInput")
+	procMouse 									 = modUser32.NewProc("mouse_event")
 	procSendMessage              = modUser32.NewProc("SendMessageW")
-	procSetForegroundWindow      = modUser32.NewProc("SetForegroundWindow")
+	procSetCursorPos 						 = modUser32.NewProc("SetCursorPos")
 )
 
 func EnumWindows(callback func(hWnd HWND, lparam uintptr) bool, lparam uintptr) error {
@@ -90,41 +90,26 @@ func SendMessage(hWnd HWND, msg uint32, wParam uintptr, lParam uintptr) uintptr 
 	return ret
 }
 
-func SendKeyPressInput(wVk uint16) bool {
-	type KeyboardInput struct {
-		wVk         uint16
-		wScan       uint16
-		dwFlags     uint32
-		time        uint32
-		dwExtraInfo uint64
-	}
-
-	type Input struct {
-		inputType uint32
-		ki        KeyboardInput
-		padding   uint64
-	}
-
-	var input Input
-	input.inputType = INPUT_KEYBOARD
-	input.ki.wVk = wVk
-	wScan, _, _ := procMapVirtualKey.Call(uintptr(wVk), uintptr(0))
-	input.ki.wScan = wScan
-	input.ki.dwFlags = 0
-	ret, _, err := procSendInput.Call(
-		uintptr(1),
-		unsafe.Pointer(&input),
-		uintptr(unsafe.Sizeof(input)),
-	)
-	log.Printf("ret: %v error: %v", ret, err)
-	return true
-}
-
-func SetForegroundWindow(hWnd HWND) uintptr {
-	ret, _, _ := procSetForegroundWindow.Call(uintptr(hWnd))
-	return ret
-}
-
 func WindowCloseMessage(hWnd HWND) uintptr {
 	return SendMessage(hWnd, WM_SYSCOMMAND, SC_CLOSE, 0)
+}
+
+func WindowSendKey(hWnd HWND, key uint16) {
+	 SendMessage(hWnd, WM_KEYDOWN, uintptr(key), 0)
+	 time.Sleep(100 * time.Millisecond)
+	 SendMessage(hWnd, WM_KEYUP, uintptr(key), 0)
+}
+
+func GetWindowRect(hwnd HWND) *RECT {
+	var rect RECT
+	procGetWindowRect.Call(
+		uintptr(hwnd),
+		uintptr(unsafe.Pointer(&rect)))
+
+	return &rect
+}
+
+func MouseClick(x int32, y int32) {
+	procSetCursorPos.Call(uintptr(x), uintptr(y))
+	procMouse.Call(uintptr(MOUSEEVENTF_LEFTDOWN | MOUSEEVENTF_LEFTUP), 0, 0, 0, 0)
 }

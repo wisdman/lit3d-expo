@@ -4,8 +4,8 @@ package chromium
 
 import (
 	"fmt"
-	"log"
 	"strings"
+	"sync"
 	"time"
 
 	"github.com/wisdman/lit3d-expo/packages/shell/winapi"
@@ -16,6 +16,8 @@ type Window struct {
 	HWND  winapi.HWND
 	PID   uint32
 }
+
+var windowMutex sync.Mutex
 
 func (w *Window) Visible() bool {
 	return winapi.IsWindowVisible(w.HWND)
@@ -29,12 +31,16 @@ func (w *Window) Close() {
 	winapi.WindowCloseMessage(w.HWND)
 }
 
-func (w *Window) SendKeyPress(key uint16) {
-	winapi.SendKeyPressInput(key)
-}
-
-func (w *Window) SetForeground() {
-	winapi.SetForegroundWindow(w.HWND)
+func (w *Window) F11() {
+	windowMutex.Lock()
+	rect := winapi.GetWindowRect(w.HWND)
+	x := int32(rect.Left + (rect.Right  - rect.Left) / 2)
+	y := int32(rect.Top  + (rect.Bottom - rect.Top)  / 2)
+	fmt.Printf("x:%d y:%d\n", x, y)
+	fmt.Printf("rect: %+v\n", rect)
+	time.Sleep(100 * time.Millisecond)
+	winapi.WindowSendKey(w.HWND, winapi.VK_F11)
+	windowMutex.Unlock()
 }
 
 func (c *Chromium) GetWindows() (*[]Window, error) {
@@ -71,6 +77,21 @@ func (c *Chromium) GetWindows() (*[]Window, error) {
   }
 
 	return &windows, nil
+}
+
+func (c *Chromium) FindWindowPrifix(prefix string) (*Window, error) {
+	wins, err := c.GetWindows()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, w := range *wins {
+		if strings.HasPrefix(w.Title, prefix) {
+   		return &w, nil
+   	}
+	}
+
+	return nil, nil
 }
 
 func (c *Chromium) WaitWindows(timeout time.Duration) (*[]Window, error) {

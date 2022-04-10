@@ -26,11 +26,7 @@ func (w *Window) Close() {
 }
 
 func (w *Window) SendKeyPress(_ uint16) {
-	log.Printf("Chromium [Window.SendF11Key] Linux OS not supported\n")
-}
-
-func (w *Window) SetForeground() {
-	log.Printf("Chromium [Window.SetForeground] Linux OS not supported\n")
+	log.Printf("Chromium [Window.SendKeyPress] Linux OS not supported\n")
 }
 
 func (c *Chromium) GetWindows() (*[]Window, error) {
