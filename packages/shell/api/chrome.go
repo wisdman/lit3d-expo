@@ -4,12 +4,11 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"strings"
 
 	"github.com/wisdman/lit3d-expo/libs/service"
 )
 
-func (api *API) ChromeKeyPress(w http.ResponseWriter, r *http.Request) {
+func (api *API) ChromeF11(w http.ResponseWriter, r *http.Request) {
 	body := struct {
 		WindowID string `json:"windowId"`
     Key      uint16 `json:"key"`
@@ -20,19 +19,19 @@ func (api *API) ChromeKeyPress(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	wins, err := api.Chrome.GetWindows()
+	prefix := fmt.Sprintf("[%s]", body.WindowID)
+	win, err := api.Chrome.FindWindowPrifix(prefix)
 	if err != nil {
 		service.Fatal(w, err)
 		return
 	}
-	
-	for _, w := range *wins {
-		prefix := fmt.Sprintf("[%s]", body.WindowID)
-		if strings.HasPrefix(w.Title, prefix) {
-			w.SetForeground()
-			w.SendKeyPress(body.Key)
-		}
+
+	if win == nil {
+		service.ResponseNoContent(w)
+		return
 	}
+
+	win.F11()
 
 	service.ResponseNoContent(w)
 }

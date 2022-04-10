@@ -82,6 +82,7 @@ func main() {
   api := &api.API{ srv.API("/api"), chrome, cfg}
   api.GET("/id", api.GetID)
   api.GET("/theme", api.GetTheme)
+  api.POST("/chrome/key", api.ChromeF11)
 
   var appFS http.FileSystem
   if cfg.AppPath != nil {
@@ -102,6 +103,8 @@ func main() {
   srv.FS("/content/", http.StripPrefix("/content/", http.FileServer(http.Dir(cfg.ContentPath))))
 
   srv.ListenAndServe()
+
+  chrome.Run("https://localhost/full-screen.html", false)
 
   stop := make(chan os.Signal, 1)
   signal.Notify(stop, os.Interrupt, syscall.SIGTERM)
