@@ -37,7 +37,6 @@ func (w *Window) SetForeground() {
 	winapi.SetForegroundWindow(w.HWND)
 }
 
-
 func (c *Chromium) GetWindows() (*[]Window, error) {
 	processes, err := winapi.EnumProcesses()
 	if err != nil {
