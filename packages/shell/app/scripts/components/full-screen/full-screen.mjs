@@ -1,5 +1,6 @@
 
 import { API } from "../../services/api.mjs" 
+import { MapperComponent } from "../mapper/mapper.mjs"
 
 import CSS from "./full-screen.css" assert { type: "css" }
 
@@ -16,7 +17,7 @@ export class FullScreenComponent extends HTMLElement {
     await this.#api.SetWindowID(windowId)
     await this.#api.ChromeF11(windowId)
     await this.#api.SetWindowID(null)
-    // this.shadowRoot.appendChild(new Mapper())
+    this.shadowRoot.appendChild(new MapperComponent())
   }
 }
 
