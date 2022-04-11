@@ -1,6 +1,8 @@
 
 import { Dialog } from "../../dialog/dialog.mjs"
 
+import { VideoTexture, ImageTexture } from "../texture/texture.mjs"
+
 import CSS from "./dialog-texture.css" assert { type: "css" }
 const CURRENT_PATH = import.meta.url.replace(/[^\/]+$/, "")
 const TEMPLATE = await (await fetch(`${CURRENT_PATH}dialog-texture.tpl`)).text()
@@ -9,26 +11,57 @@ const CANCEL = "Cancel"
 const CONFIRM = "Confirm"
 
 export class TextureDialog extends Dialog {
-  static TYTLE = "Select texture part color"
+  static TYTLE = "Select texture parts"
   static STYLE = [CSS]
   static TEMPLATE = TEMPLATE
   static BUTTONS = [CANCEL, CONFIRM]
 
-  async init(root) {
-    const selectNode = root.querySelector("select")
-    selectNode.addEventListener("keydown", ({key}) => key.toUpperCase() === "ENTER" && this.submit(CONFIRM))
+  async init(root, { url } = {}) {
+    const partsNode = root.querySelector("#parts")
+    const cordsNode = root.querySelector("#cords")
+    const selectorNode = root.querySelector("#selector")
+
     
-    const parts = 6
-    for (let i = 2; i <= parts; i++) {
-      for (let j = 0; j < i; j++) {
-        const dx = Math.round(1/i * 1000)/1000
-        const cords = `${j*dx},0,${j*dx+dx},0,${j*dx+dx},1,${j*dx},1`
-        const option = document.createElement("option")
-        option.value = cords
-        option.innerHTML = `${j+1}/${i} => ${cords}`
-        selectNode.appendChild(option)
-      }
+    const imgNode = root.querySelector("img")
+    const videoNode = root.querySelector("video")
+    videoNode.controls = false
+
+    if (VideoTexture.isThisTexture({url})) {
+      videoNode.src = url
+      videoNode.classList.add("active")
+      videoNode.play()
+    } else {
+      videoNode.classList.remove("active")
+      videoNode.pause()
     }
+    
+    if (ImageTexture.isThisTexture({url})) {
+      imgNode.src = url
+      imgNode.classList.add("active")
+    } else {
+      imgNode.classList.remove("active")
+    }
+
+    const getData = (parts, part) => {
+      const w = 1 / parts
+      const x = part * w
+      cordsNode.value = `${x},0,${x+w},0,${x+w},1,${x},1`
+    }
+
+    partsNode.addEventListener("input", () => {
+      const parts = Number.parseInt(partsNode.value)
+      selectorNode.innerHTML = ""
+      if (parts > 1) {
+        for (let i = 0; i < parts; i++) {
+          const span = document.createElement("span")
+          span.addEventListener("click", () => getData(parts, i))
+          selectorNode.appendChild(span)
+        }
+        return
+      }
+      cordsNode.value = "0,0,1,0,1,1,0,1"
+    }, { passive: true })
+
   }
 
   async onSubmit(returnValue, data) {

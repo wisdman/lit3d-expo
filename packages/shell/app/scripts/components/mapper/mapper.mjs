@@ -23,7 +23,9 @@ const FRAGMENT_SHADER = await (await fetch(`${CURRENT_PATH}shaders/fragment.glsl
 
 const POSITION_ATTRIBUTE_LOCATION_NAME = "a_position"
 const TEXCOORD_ATTRIBUTE_LOCATION_NAME = "a_texcoord"
+const MASKCOORD_ATTRIBUTE_LOCATION_NAME = "a_maskcoord"
 const TEXTURE_UNIFORM_LOCATION_NAME = "u_texture"
+const MASK_UNIFORM_LOCATION_NAME = "u_mask"
 
 export class MapperComponent extends HTMLElement {
   static CONTEXT_ATTRIBUTES = {
@@ -32,6 +34,7 @@ export class MapperComponent extends HTMLElement {
     depth: false,
     desynchronized: true,
     powerPreference: "high-performance",
+    premultipliedAlpha: false,
   }
 
   #SHORTCUTS = {
@@ -55,18 +58,19 @@ export class MapperComponent extends HTMLElement {
   #program = this.#gl.createProgram()
   #positionAttributeLocation = undefined
   #texcoordAttributeLocation = undefined
+  #maskcoordAttributeLocation = undefined
 
   #textureUniformLocation = undefined
+  #maskUniformLocation = undefined
 
   #vertexArray = this.#gl.createVertexArray()
   #positionBuffer = this.#gl.createBuffer()
   #texcoordBuffer = this.#gl.createBuffer()
+  #maskcoordBuffer = this.#gl.createBuffer()
 
   #api = new API()
-  #frameList = new FrameList()
-  // #frameList = new FrameList(this.#config.raw?.frames)
+  #frameList = new FrameList(this.#gl)
   #textureList = new TextureList(this.#gl)
-  // #textureList = new TextureList(this.#gl, this.#config.raw?.textures)
 
   #frameEditor = undefined
   #textureEditor = undefined
@@ -114,7 +118,9 @@ export class MapperComponent extends HTMLElement {
 
     this.#positionAttributeLocation = this.#gl.getAttribLocation(this.#program, POSITION_ATTRIBUTE_LOCATION_NAME)
     this.#texcoordAttributeLocation = this.#gl.getAttribLocation(this.#program, TEXCOORD_ATTRIBUTE_LOCATION_NAME)
+    this.#maskcoordAttributeLocation = this.#gl.getAttribLocation(this.#program, MASKCOORD_ATTRIBUTE_LOCATION_NAME)
     this.#textureUniformLocation = this.#gl.getUniformLocation(this.#program, TEXTURE_UNIFORM_LOCATION_NAME)
+    this.#maskUniformLocation = this.#gl.getUniformLocation(this.#program, MASK_UNIFORM_LOCATION_NAME)
   }
 
   #initGeometry = () => {
@@ -143,10 +149,22 @@ export class MapperComponent extends HTMLElement {
       0,              // stride
       0,              // offset
     )
+
+    this.#gl.enableVertexAttribArray(this.#maskcoordAttributeLocation)
+    this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#maskcoordBuffer)
+    this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(), this.#gl.STATIC_DRAW)
+    this.#gl.vertexAttribPointer(
+      this.#maskcoordAttributeLocation,
+      TEXTCORD_SIZE,  // textore cord vector size
+      this.#gl.FLOAT, // 32bit floats
+      true,           // normalize
+      0,              // stride
+      0,              // offset
+    )
   }
 
   #updateGeometry = () => {
-    const { dstPositions, dstTextureCoords, textureIds } = this.#frameList
+    const { dstPositions, dstTextureCoords, dstMaskCoords, textureIds } = this.#frameList
     const aPositions = ProcessVectorArray(this.#viewProjectionMatrix, dstPositions)
 
     this.#gl.bindVertexArray(this.#vertexArray)
@@ -156,6 +174,9 @@ export class MapperComponent extends HTMLElement {
 
     this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#texcoordBuffer)
     this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(dstTextureCoords), this.#gl.STATIC_DRAW)
+
+    this.#gl.bindBuffer(this.#gl.ARRAY_BUFFER, this.#maskcoordBuffer)
+    this.#gl.bufferData(this.#gl.ARRAY_BUFFER, new Float32Array(dstMaskCoords), this.#gl.STATIC_DRAW)
 
     this.#textureIds = textureIds
   }
@@ -182,8 +203,9 @@ export class MapperComponent extends HTMLElement {
     this.#gl.useProgram(this.#program)
     this.#gl.bindVertexArray(this.#vertexArray)
     
-    for (const [i, [texId, maskId]] of this.#textureIds.entries()) {
-      this.#gl.uniform1i(this.#textureUniformLocation, texId)
+    for (const [i, [tex, mask]] of this.#textureIds.entries()) {
+      this.#gl.uniform1i(this.#textureUniformLocation, tex)
+      this.#gl.uniform1i(this.#maskUniformLocation, mask)
       this.#gl.drawArrays(this.#gl.TRIANGLES, i * VERTEX_COUNT, VERTEX_COUNT)
     }
 
@@ -220,14 +242,12 @@ export class MapperComponent extends HTMLElement {
     mapping.frames = this.#frameList
     mapping.textures = this.#textureList
     mapping.location = [x,y]
-
-    console.dir(JSON.stringify(mapping))
     await this.#api.SetConfigContentMappingByID(mapping)
   }
 
   async load() {
     const {frames = [], textures = []} = await this.#api.GetConfigContentMappingByID()
-    this.#frameList = new FrameList(frames)
+    this.#frameList = new FrameList(this.#gl, frames)
     this.#textureList = new TextureList(this.#gl, textures)
   }
 

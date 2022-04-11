@@ -3,7 +3,6 @@ import { Keyboard } from "../../../services/keyboard.mjs"
 
 import { UrlDialog } from "./dialog-url.mjs"
 import { ColorDialog } from "./dialog-color.mjs"
-import { MaskDialog } from "./dialog-mask.mjs"
 import { VideoTexture, ImageTexture, ColorTexture, MaskTexture  } from "./texture.mjs"
 
 import CSS from "./texture-editor.css" assert { type: "css" }
@@ -11,11 +10,9 @@ import CSS from "./texture-editor.css" assert { type: "css" }
 export class TextureEditor extends HTMLElement {
   #SHORTCUTS = {
     "C": this.createColor, // New color texture
-    "M": this.createMask,  // New mask node
     "U": this.createURL,   // New texture from url
 
     "SHIFT+C": this.replaceColor, // Replace current texture with new color texture
-    "SHIFT+M": this.replaceMask,  // Replace current texture with new mask node
     "SHIFT+U": this.replaceURL,   // Replace current texture with new texture from url
 
     "D": this.delete, // Delete texture
@@ -33,7 +30,6 @@ export class TextureEditor extends HTMLElement {
 
   #urlDialog = undefined
   #colorDialog = undefined
-  #maskDialog = undefined
 
   #textureList = undefined
   get textures() { return [...this.#textureList] }
@@ -120,23 +116,12 @@ export class TextureEditor extends HTMLElement {
     this.#keyboard.active = true
   }
 
-  async createMask() {
-    this.#keyboard.active = false
-    this.#maskDialog = this.#maskDialog ?? new MaskDialog()
-    const color = await this.#maskDialog.modal()
-    if (color !== undefined) { 
-      this.#activeTexture = this.#textureList.new({ mask: { color } })
-      this.#render()
-    }
-    this.#keyboard.active = true
-  }
-
   async createURL() {
     this.#keyboard.active = false
     this.#urlDialog = this.#urlDialog ?? new UrlDialog()
     const url = await this.#urlDialog.modal()
     if (url !== undefined) { 
-      this.#activeTexture = this.#textureList.new({ id, url })
+      this.#activeTexture = this.#textureList.new({ url })
       this.#render()
     }
     this.#keyboard.active = true
@@ -157,20 +142,6 @@ export class TextureEditor extends HTMLElement {
     this.#keyboard.active = true
   }
 
-  async replaceMask() {
-    if (this.#activeTexture === undefined) { return }
-    this.#keyboard.active = false
-    this.#maskDialog = this.#maskDialog ?? new MaskDialog()
-    const color = await this.#maskDialog.modal()
-    if (color !== undefined) { 
-      const id = this.activeTexture.id
-      this.#textureList.delete(this.activeTexture)
-      this.#activeTexture = this.#textureList.new({ id, mask: { color } })
-      this.#render()
-    }
-    this.#keyboard.active = true
-  }
-
   async replaceURL() {
     if (this.#activeTexture === undefined) { return }
     this.#urlDialog = this.#urlDialog ?? new UrlDialog()
@@ -185,7 +156,6 @@ export class TextureEditor extends HTMLElement {
   }
 
   delete() {
-    // console.log("DEL")
     this.#textureList.delete(this.activeTexture)
     this.#activeTexture = undefined
     this.#render()
@@ -197,8 +167,7 @@ export class TextureEditor extends HTMLElement {
 
   select() {
     if (this.#activeTexture === undefined) { return }
-    const detail = { [this.#activeTexture instanceof MaskTexture ? "mask" : "texture"]: this.#activeTexture.id }
-    this.dispatchEvent(new CustomEvent("close", { detail }))
+    this.dispatchEvent(new CustomEvent("close", { detail: { texture: this.#activeTexture.id } }))
   }
 
   play() { this.#textureList.play() }
@@ -215,12 +184,8 @@ export class TextureEditor extends HTMLElement {
     this.shadowRoot.innerHTML = ""
   }
 
-  modal = (filter) => {
-    console.log("TODO: filter")
-    // this.#filter = filter
-    // this.#render()
-    return new Promise(resolve => this.addEventListener("close", ({detail}) => resolve(detail), { once: true }))
-  }
+  modal = (filter) =>
+    new Promise(resolve => this.addEventListener("close", ({detail}) => resolve(detail), { once: true }))
 }
 
 customElements.define("ss-mapper-textures", TextureEditor)

@@ -33,6 +33,32 @@ export class FrameTexture {
   get [3]() { return this[SYMBOL_3] }
   set [3](value) { this[SYMBOL_3] = new Float32Vector2(value) }
 
+  move(...args) {
+    // move(index, dx, dy)
+    if (args.length >= 3) { 
+      const [i, dx, dy] = args
+      const [x1, y1] = this[i]
+      const [x2, y2] = this[i+1 > 3 ? 0 : i+1]
+      this[i] = [x1 + dx, y1 + dy]
+      this[i+1 > 3 ? 0 : i+1] = [x2 + dx, y2 + dy]
+      return
+    }
+
+    // move(dx, dy)
+    const [dx = 0, dy = dx] = args
+    for (let i = 0; i < SIZE; i++) {
+      const [x, y] = this[i]
+      this[i] = [x + dx, y + dy]
+    }
+  }
+
+  reset() {
+    this[0] = [0, 0]
+    this[1] = [1, 0]
+    this[2] = [1, 1]
+    this[3] = [0, 1]
+  }
+
   get cords() {
     const [, ...cords] = this
     return cords

@@ -3,7 +3,6 @@ import { Keyboard } from "../../../services/keyboard.mjs"
 import { DEFAULT_RESOLUTION } from "/common/entities/constants.mjs"
 
 import { TextureEditor } from "../texture/texture-editor.mjs"
-import { MaskTexture } from "../texture/texture.mjs"
 
 import { TextureDialog } from "./dialog-texture.mjs"
 
@@ -45,10 +44,19 @@ export class FrameEditor extends HTMLElement {
     return path
   }
 
-  static Text([x, y], textData) {
+  static Text([x1, y1, x2, y2, x3, y3, x4, y4], textData = "") {
+    const minX = Math.min(x1,x2,x3,x4)
+    const maxX = Math.max(x1,x2,x3,x4)
+    const x = minX + (maxX - minX) / 2
+
+    const minY = Math.min(y1,y2,y3,y4)
+    const maxY = Math.max(y1,y2,y3,y4)
+    const y = minY + (maxY - minY) / 2  
+
     const text = document.createElementNS(SVG_NAMESPACE, "text")
     text.setAttributeNS(null, "x", x)
     text.setAttributeNS(null, "y", y)
+    text.setAttributeNS(null, "text-anchor", "middle")
     text.innerHTML = textData
     return text
   }
@@ -94,14 +102,14 @@ export class FrameEditor extends HTMLElement {
     [`[${MODE_FRAME}]3`]: this.selectCorner.bind(this, 3), // Bottom-Right
     [`[${MODE_FRAME}]4`]: this.selectCorner.bind(this, 4), // Bottom-Left
     
-    [`[${MODE_FRAME}]R`]: this.setResolution, // Set frame resolution
     [`[${MODE_FRAME}]T`]: this.setTexture,    // Set frame texture
-    [`[${MODE_FRAME}]M`]: this.setMask,       // Set frame mask
 
     [`[${MODE_FRAME}]D`]: this.deleteFrame, // Delete frame
 
     [`[${MODE_FRAME}]P`]: this.play,        // Play frame content
     [`[${MODE_FRAME}]SHIFT+P`]: this.pause, // Pause frame content
+
+    [`[${MODE_FRAME}]SHIFT+R`]: this.resizeFrame, // Reset frame
     
     [`[${MODE_FRAME}]SHIFT+T`]: this.editTexture, // Edit texture
     [`[${MODE_FRAME}]SHIFT+M`]: this.editMask,    // Edit mask
@@ -143,9 +151,35 @@ export class FrameEditor extends HTMLElement {
     
     // Texture edit mode
 
-    [`[${MODE_CORNER}]ESCAPE`]: this.endTextureEdit, // End edit texture
+    [`[${MODE_TEXTURE}]H`]: this.setectPart, // Reset texture
+
+    [`[${MODE_TEXTURE}]R`]: this.resizeTexture, // Reset texture
+    [`[${MODE_TEXTURE}]SHIFT+R`]: this.resetTexture, // Reset texture
+
+    [`[${MODE_TEXTURE}]ARROWLEFT`]: this.moveTextureLeft,       // Move texture left
+    [`[${MODE_TEXTURE}]SHIFT+ARROWLEFT`]: this.moveTextureLeft, // Move texture left
+
+    [`[${MODE_TEXTURE}]ARROWRIGHT`]: this.moveTextureRight,       // Move texture right
+    [`[${MODE_TEXTURE}]SHIFT+ARROWRIGHT`]: this.moveTextureRight, // Move texture right
+
+    [`[${MODE_TEXTURE}]ARROWUP`]: this.moveTextureUp,       // Move texture up
+    [`[${MODE_TEXTURE}]SHIFT+ARROWUP`]: this.moveTextureUp, // Move texture up
+
+    [`[${MODE_TEXTURE}]ARROWDOWN`]: this.moveTextureDown,       // Move texture down
+    [`[${MODE_TEXTURE}]SHIFT+ARROWDOWN`]: this.moveTextureDown, // Move texture down
+
+    [`[${MODE_TEXTURE}]ESCAPE`]: this.endTextureEdit, // End edit texture
 
     // Mask edit mode
+
+    [`[${MODE_MASK}]R`]: this.resizeMask, // Resize mask
+    [`[${MODE_MASK}]SHIFT+R`]: this.resetMask, // Reset mask
+
+    [`[${MODE_MASK}]ARROWLEFT`]: this.moveMaskLeft,       // Move texture left
+    [`[${MODE_MASK}]SHIFT+ARROWLEFT`]: this.moveMaskLeft, // Move texture left
+
+    [`[${MODE_MASK}]ARROWRIGHT`]: this.moveMaskRight,       // Move texture right
+    [`[${MODE_MASK}]SHIFT+ARROWRIGHT`]: this.moveMaskRight, // Move texture right
 
     [`[${MODE_MASK}]ESCAPE`]: this.endMaskEdit, // End edit mask
 
@@ -215,7 +249,7 @@ export class FrameEditor extends HTMLElement {
 
   #isMaskMode = undefined
   get isMaskMode() { return this.#isMaskMode }
-  set isMaskMode(frame) {
+  set isMaskMode(value) {
     this.#activeCorner = this.#isTextureMode = this.#isMaskMode = undefined
     if (this.#activeFrame === undefined) {
       this.#keyboard.mode = MODE_EMPTY
@@ -241,7 +275,17 @@ export class FrameEditor extends HTMLElement {
       this.#svg.appendChild(FrameEditor.Corner(frame.corners[1], isActive && this.#activeCorner === 1))
       this.#svg.appendChild(FrameEditor.Corner(frame.corners[2], isActive && this.#activeCorner === 2))
       this.#svg.appendChild(FrameEditor.Corner(frame.corners[3], isActive && this.#activeCorner === 3))
-      // this.#svg.appendChild 
+      
+      if (isActive && this.isTextureMode) {
+        const [ w, h ] = frame.size
+        this.#svg.appendChild(FrameEditor.Text(frame.corners, `${w} x ${h}`))
+      } else if (isActive && this.isMaskMode) {
+        const { size, from, to } = frame.mask
+        this.#svg.appendChild(FrameEditor.Text(frame.corners, `${from} - ${size} - ${to}`))
+      } else {
+        this.#svg.appendChild(FrameEditor.Text(frame.corners, `[${frame.id + 1}${ this.#activeCorner !== undefined ? `:${this.#activeCorner + 1}` : ""}]`))
+      }
+      
     }
     this.dispatchEvent(new Event("render"))
   }
@@ -269,31 +313,24 @@ export class FrameEditor extends HTMLElement {
     this.#render()
   }
 
-  setResolution() { console.log("TODO: Set resolution") }
-  
-  setTextureOrMask = async (filter = {}) => {
-    this.#keyboard.active = false
-    this.#textureEditor = this.#textureEditor ?? new TextureEditor(this.#textureList)
-    this.shadowRoot.appendChild(this.#textureEditor)
-    const {texture, mask} = await this.#textureEditor.modal(filter)
-    this.shadowRoot.removeChild(this.#textureEditor)
-    if (this.activeFrame) {
-      if ( texture !== undefined )  { this.activeFrame.texture.id = texture }
-      // if ( mask !== undefined ) { this.activeFrame.mask.id = mask }
-      if ( mask !== undefined ) { this.activeFrame.texture.id = mask }
-    }
+  resizeFrame() {
+    if (this.#activeFrame === undefined) { return }
+    const texture = this.#textureList.get({ id: this.activeFrame.texture.id })
+    if (texture === undefined) { return }
+    const [w,h] = texture.size
+    this.activeFrame.size = [w,h]
+    this.activeFrame.texture.reset()
+    this.activeFrame.corners = [0,0,w,0,w,h,0,h]
     this.#render()
-    this.#keyboard.active = true
   }
 
-  setTexture() { this.setTextureOrMask({ not: MaskTexture }) }
-  setMask() { this.setTextureOrMask({ is: MaskTexture }) }
-
-  async editTexture() {
+  async setectPart() {
     if (this.#activeFrame === undefined) { return }
+    const texture = this.#textureList.get({ id: this.activeFrame.texture.id })
+    if (texture === undefined) { return }
     this.#keyboard.active = false
     this.#textureDialog = this.#textureDialog ?? new TextureDialog()
-    const cords = await this.#textureDialog.modal()
+    const cords = await this.#textureDialog.modal({ url: texture.url })
     if (cords !== undefined) { 
       this.#activeFrame.texture.cords = cords
       this.#render()
@@ -301,9 +338,64 @@ export class FrameEditor extends HTMLElement {
     this.#keyboard.active = true
   }
 
+
+  resetTexture() {
+    if (this.#activeFrame === undefined) { return }
+    const texture = this.#textureList.get({ id: this.activeFrame.texture.id })
+    if (texture === undefined) { return }
+    const size = texture.size
+    this.activeFrame.size = size
+    this.activeFrame.texture.reset()
+    this.#render()
+  }
+
+  resizeTexture() {
+    if (this.#activeFrame === undefined) { return }
+    const texture = this.#textureList.get({ id: this.activeFrame.texture.id })
+    if (texture === undefined) { return }
+    const [w, h] = texture.size
+    const [x1, y1] = this.activeFrame.texture[0]
+    const [x2, y2] = this.activeFrame.texture[2]
+    const dw = Math.round((Math.max(x1,x2) - Math.min(x1,x2)) * w)
+    const dh = Math.round((Math.max(y1,y2) - Math.min(y1,y2)) * h)
+    this.activeFrame.size = [dw, dh]
+    this.#render()
+  }
+
+  resizeMask() {
+    if (this.#activeFrame === undefined) { return }
+    const [w] = this.activeFrame.size
+    this.#activeFrame.maskTexture = { size: w, from: 0, to: w }
+    this.#render()
+  }
+
+  resetMask() {
+    if (this.#activeFrame === undefined) { return }
+    this.#activeFrame.maskTexture = { size: 0, from: 0, to: 0 }
+    this.#render()
+  }
+  
+  async setTexture() {
+    this.#keyboard.active = false
+    this.#textureEditor = this.#textureEditor ?? new TextureEditor(this.#textureList)
+    this.shadowRoot.appendChild(this.#textureEditor)
+    const { texture } = await this.#textureEditor.modal()
+    this.shadowRoot.removeChild(this.#textureEditor)
+    if (this.activeFrame && texture !== undefined) {
+      this.activeFrame.texture.id = texture
+    }
+    this.#render()
+    this.#keyboard.active = true
+  }
+
+  async editTexture() {
+    if (this.#activeFrame === undefined) { return }
+    this.isTextureMode = true
+  }
+
   editMask() {
     if (this.#activeFrame === undefined) { return }
-    console.log("TODO: editMask")
+    this.isMaskMode = true
   }
 
   play() { this.#textureList.get(this.activeFrame.texture)?.play?.() }
@@ -355,6 +447,58 @@ export class FrameEditor extends HTMLElement {
 
   moveCornerDown({shift}) {
     this.activeFrame?.corners?.move(this.activeCorner, 0, shift ? 10 : 1)
+    this.#render()
+  }
+
+  moveTextureLeft({shift, caps}) {
+    if (this.#activeFrame === undefined) { return }
+    const [w] = this.#activeFrame.size
+    const dx = 1/w * (caps ? 10 : 1)
+    this.activeFrame?.texture?.move(shift ? 1 : 3, dx, 0)
+    this.#render()
+  }
+
+  moveTextureRight({shift, caps}) {
+    if (this.#activeFrame === undefined) { return }
+    const [w] = this.#activeFrame.size
+    const dx = -1/w * (caps ? 10 : 1)
+    this.activeFrame?.texture?.move(shift ? 1 : 3, dx, 0)
+    this.#render()
+  }
+
+  moveTextureUp({shift, caps}) {
+    if (this.#activeFrame === undefined) { return }
+    const [, h] = this.#activeFrame.size
+    const dy = 1/h * (caps ? 10 : 1)
+    this.activeFrame?.texture?.move(shift ? 2 : 0, 0, dy)
+    this.#render()
+  }
+
+  moveTextureDown({shift, caps}) {
+    if (this.#activeFrame === undefined) { return }
+    const [, h] = this.#activeFrame.size
+    const dy = -1/h * (caps ? 10 : 1)
+    this.#activeFrame.texture?.move(shift ? 2 : 0, 0, dy)
+    this.#render()
+  }
+
+  moveMaskLeft({shift}) {
+    if (this.#activeFrame === undefined) { return }
+    let { size, from, to } = this.#activeFrame.mask
+    if (shift) { to-- } else { from-- }
+    if (from < 0 ) from = 0
+    if (to > size) to = size 
+    this.#activeFrame.maskTexture = { size, from, to }
+    this.#render()
+  }
+
+  moveMaskRight({shift}) {
+    if (this.#activeFrame === undefined) { return }
+    let { size, from, to } = this.#activeFrame.mask
+    if (shift) { to++ } else { from++ }
+    if (from < 0 ) from = 0
+    if (to > size) to = size 
+    this.#activeFrame.maskTexture = { size, from, to }
     this.#render()
   }
 

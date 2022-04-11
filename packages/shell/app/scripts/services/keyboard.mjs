@@ -11,10 +11,11 @@ export class Keyboard extends Map {
 
   static #keyDown = (event) => {
     const { key, altKey:alt, ctrlKey:ctrl, metaKey:meta, shiftKey:shift } = event
+    const caps = event.getModifierState("CapsLock")
     const root = this.root(key, alt, ctrl, meta, shift)
     if (this.#listeners.length <= 0) { return }
     for (const listener of this.#listeners) {
-      if (listener.call(root, { key, alt, ctrl, meta, shift })) {
+      if (listener.call(root, { key, alt, ctrl, meta, shift, caps })) {
         event.preventDefault()
         event.stopPropagation()
         return

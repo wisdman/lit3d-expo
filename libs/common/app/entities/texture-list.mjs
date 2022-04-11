@@ -1,17 +1,17 @@
 
 import { IdsList } from "./ids-list.mjs"
 
-import { Texture, UrlTexture, MaskTexture, ColorTexture } from "./texture.mjs"
+import { Texture, UrlTexture, ColorTexture } from "./texture.mjs"
 
-import { MAX_TEXTURES } from "./constants.mjs"
+import { MAX_FRAMES, MAX_TEXTURES } from "./constants.mjs"
 
 export class TextureList extends IdsList {
   static TYPE = Texture
+  static MIN = MAX_FRAMES + 1
   static MAX = MAX_TEXTURES
 
   static GET_TEXTURE_CLASS = args => {
     if (UrlTexture.isThisTexture(args)) return UrlTexture
-    if (MaskTexture.isThisTexture(args)) return MaskTexture
     if (ColorTexture.isThisTexture(args)) return ColorTexture
     return Texture
   }

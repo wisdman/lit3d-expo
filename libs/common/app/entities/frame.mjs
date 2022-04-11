@@ -5,6 +5,7 @@ import { FindHomography } from "../math/homography.mjs"
 import { ProcessVectorArray } from "../math/process.mjs"
 
 import { FrameCorners } from "./frame-corners.mjs"
+import { FrameMask } from "./frame-mask.mjs"
 import { FrameSize } from "./frame-size.mjs"
 import { FrameTexture } from "./frame-texture.mjs"
 
@@ -25,9 +26,9 @@ export class Frame {
   get texture() { return this.#texture }
   set texture(value) { this.#texture = new FrameTexture(value) }
 
-  #mask = new FrameTexture()
+  #mask = new FrameMask()
   get mask() { return this.#mask }
-  set mask(value) { this.#mask = new FrameTexture(value) }
+  set mask(value) { this.#mask = new FrameMask(value) }
 
   get dstPositions() {
     const homographyMatrix = FindHomography(this.#size.cords, [...this.#corners])
@@ -51,10 +52,10 @@ export class Frame {
   }
 
   toJSON() { return {
-    id: this.#id,
-    size: this.#size,
-    corners: this.#corners,
-    texture: this.#texture,
-    mask: this.#mask,
+    id: this.id,
+    size: this.size,
+    corners: this.corners,
+    texture: this.texture,
+    mask: this.mask,
   }}
 }

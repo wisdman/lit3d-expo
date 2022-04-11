@@ -1,8 +1,7 @@
 
 import { 
-  // ColorTexture as EntitiesColorTexture,
+  Texture as EntitiesTexture,
   ColorTexture as EntitiesColorTexture,
-  MaskTexture  as EntitiesMaskTexture,
   UrlTexture   as EntitiesUrlTexture,
 } from "/common/entities/texture.mjs"
 
@@ -63,7 +62,7 @@ const GLTextureMixin = (Base) => class GLTexture extends Base {
     )
   }
 
-  remove() {
+  delete() {
     this.#gl.deleteTexture(this.#texture)
   }
 }
@@ -71,22 +70,45 @@ const GLTextureMixin = (Base) => class GLTexture extends Base {
 export class ColorTexture extends GLTextureMixin(EntitiesColorTexture) {
   static isThisTexture(args) { return super.isThisTexture(args) }
 
-  get source() { return new Uint8Array(this.color) }
+  get size() { return [1,1] }
+
+  // get source() { return new Uint8Array(this.color) }
   update = () => {}
 
   constructor(gl, args = {}) {
-    // TODO: Fix color texture
+    // console.log(args)
     super(gl, gl.RGB, 1, 1, gl.RGB, gl.UNSIGNED_BYTE, new Uint8Array([0,0,0]), args)
     // super.update()
   }
 }
 
-export class MaskTexture extends GLTextureMixin(EntitiesMaskTexture) {
-  static isThisTexture(args) { return super.isThisTexture(args) }
+export class MaskTexture extends GLTextureMixin(EntitiesTexture) {
+  static BuildMask = ({ size = 0, from = 0, to = 0 } = {}) => {
+    if (size === 0) { return new Uint8Array([255]) }
+    
+    if (!Number.isInteger(size)) {  throw new TypeError(`MaskTexture [BuildMask]: Size "${size}" isn't an integer value`) }
+    if (size < 0) {  throw new TypeError(`MaskTexture [BuildMask]: Size "${size}" less than zero`) }
+    
+    if (!Number.isInteger(from)) {  throw new TypeError(`MaskTexture [BuildMask]:  From "${from}" isn't an integer value`) }
+    if (from < 0) {  throw new TypeError(`MaskTexture [BuildMask]: From "${from}" less than zero`) }
+    if (from > size) {  throw new TypeError(`MaskTexture [BuildMask]: From "${from}" more than Size "${size}"`) }
+    if (from > to) {  throw new TypeError(`MaskTexture [BuildMask]: From "${from}" more than To "${to}"`) }
+    
+    if (!Number.isInteger(to)) {  throw new TypeError(`MaskTexture [BuildMask]: To "${to}" isn't an integer value`) }
+    if (to < 0) { throw new TypeError(`MaskTexture [BuildMask]: To "${to}" less than zero`) }
+    if (to > size) { throw new TypeError(`MaskTexture [BuildMask]: To "${to}" more than Size "${size}"`) }
+
+    let delta = from > 0 ? 255 / from : 0
+    const left = Array.from(new Array(from), (_, i) => Math.floor(i * delta))
+    const center = Array.from(new Array(to - from), (_, i) => 255)
+    delta = size - to > 0 ? 255 / (size - to) : 0
+    const right =  Array.from(new Array(size - to), (_, i) => Math.floor(i * delta)).reverse()
+    return new Uint8Array([...left, ...center, ...right])
+  }
 
   constructor(gl, args = {}) {
-    const data = Array.isArray(args.mask?.color) ? new Uint8Array(args.mask.color) : new Uint8Array([0, 255])
-    super(gl, gl.LUMINANCE, data.length, 1, gl.LUMINANCE, gl.UNSIGNED_BYTE, data, args)
+    const color = MaskTexture.BuildMask(args)
+    super(gl, gl.LUMINANCE, color.length, 1, gl.LUMINANCE, gl.UNSIGNED_BYTE, color, args)
   }
 }
 
@@ -119,6 +141,8 @@ export class VideoTexture extends UrlTexture {
   #video = document.createElement("video")
   get source() { return this.#video }
 
+  get size() { return [this.#video.videoWidth, this.#video.videoHeight] }
+
   play() {
     this.#video.currentTime = 0
     this.#video.play()
@@ -146,6 +170,8 @@ export class ImageTexture extends UrlTexture {
   static isThisTexture({ url } = {}) { return IMAGE_EXT.includes(EXT_RX.exec("." + url)?.groups?.ext) }
   #image = new Image()
   get source() { return this.#image }
+
+  get size() { return [this.#image.naturalWidth, this.#image.naturalHeight] }
 
   constructor(...args) {
     super(...args)

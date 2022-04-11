@@ -12,5 +12,5 @@ export class FrameList extends IdsList {
   get dstTextureCoords() { return this.reduce((acc, {dstTextureCoords}) => [...acc, ...dstTextureCoords], []) }
   get dstMaskCoords() { return this.reduce((acc, {dstMaskCoords}) => [...acc, ...dstMaskCoords], []) }
 
-  get textureIds() { return this.reduce((acc, {texture:{id:texId},mask:{id:maskId}}) => [...acc, [texId, maskId]], []) }
+  get textureIds() { return this.reduce((acc, {texture:{id:tex}, id}) => [...acc, [tex, id]], []) }
 }

@@ -52,7 +52,7 @@ type Frame struct {
   Corners [8]int16   `json:"corners"`
   
   Texture [9]float32 `json:"texture,omitempty"`
-  Mask    [9]float32 `json:"mask,omitempty"`
+  Mask    Mask       `json:"mask"`
 }
 
 type Texture struct {
@@ -63,13 +63,12 @@ type Texture struct {
   Loop   *bool      `json:"loop,omitempty"`
 
   Color *[2]uint16  `json:"color,omitempty"`
-
-  Mask *TextureMask `json:"mask,omitempty"`
 }
 
-type TextureMask struct {
-  Color []uint16 `json:"color,omitempty"`
-  URL   *string  `json:"url,omitempty"`
+type Mask struct {
+  Size uint16 `json:"size"`
+  From uint16 `json:"from"`
+  To   uint16 `json:"to"`
 }
 
 type Sound struct {

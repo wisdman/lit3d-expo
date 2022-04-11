@@ -1,13 +1,12 @@
 
 import { flatIterator, filterUndefined } from "/common/types/utils.mjs"
 import { TextureList as EntitiesTextureList } from "/common/entities/texture-list.mjs"
-import { ColorTexture, ImageTexture, MaskTexture, VideoTexture } from "./texture.mjs"
+import { ColorTexture, ImageTexture, VideoTexture } from "./texture.mjs"
 
 export class TextureList extends EntitiesTextureList {
   static GET_TEXTURE_CLASS = args => {
     if (ColorTexture.isThisTexture(args)) return ColorTexture
     if (ImageTexture.isThisTexture(args)) return ImageTexture
-    if (MaskTexture.isThisTexture(args)) return MaskTexture
     if (VideoTexture.isThisTexture(args)) return VideoTexture
     throw new TypeError(`TextureList [GET_TEXTURE_CLASS]: Texture "${args}" class not detected`)
   }
@@ -33,6 +32,12 @@ export class TextureList extends EntitiesTextureList {
     const item = new TextureClass(this.#gl, { id: this.id, ...args })
     super.add(item)
     return item
+  }
+
+  delete(item) {
+    if (super.delete(item)) {
+      item.delete()
+    }
   }
 }
 

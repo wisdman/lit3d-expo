@@ -1,9 +1,10 @@
 
 import { List } from "../types/list.mjs"
-import { UInt8 } from "../types/numeric.mjs"
-
 
 export class IdsList extends List {
+  static MIN = 0
+  get min() { return Object.getPrototypeOf(this).constructor.MIN }
+
   static MAX = 0
   get max() { return Object.getPrototypeOf(this).constructor.MAX }
 
@@ -11,10 +12,10 @@ export class IdsList extends List {
 
   get id() {
     const ids = this.ids
-    for (let i = 0, max = this.max; i < max; i++) {
+    for (let i = this.min, max = this.max; i < max; i++) {
       if (!ids.includes(i)) { return i }
     }
-    throw new Error(`IdsList [id]: Too many ids, max ${this.max()}`)
+    throw new Error(`IdsList [id]: Not in range [${this.min()}..${this.max()}]`)
   }
 
   new(args = {}) {
