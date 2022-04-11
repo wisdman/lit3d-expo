@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"sync"
 )
 
 var (
@@ -32,6 +33,9 @@ type Config struct {
   Theme       string `json:"theme"`
   
   Content     Content `json:"-"`
+
+  writeMutex        sync.Mutex
+  writeContentMutex sync.Mutex
 }
 
 func New(configFilePath string, configStr string) *Config {
@@ -118,6 +122,9 @@ func (c *Config) Read() error {
 }
 
 func (c *Config) Write() error {
+  c.writeMutex.Lock()
+  defer c.writeMutex.Unlock()
+
   file, err := os.OpenFile(c.filePath, os.O_WRONLY|os.O_CREATE, 0644)
   if err != nil {
     return fmt.Errorf("Config [Write] File error: %w", err)
@@ -151,6 +158,9 @@ func (c *Config) ReadContent() error {
 }
 
 func (c *Config) WriteContent() error {
+  c.writeContentMutex.Lock()
+  defer c.writeContentMutex.Unlock()
+  
   configPath := filepath.Join(c.ContentPath, c.Theme + ".json")
   file, err := os.OpenFile(configPath, os.O_WRONLY|os.O_CREATE, 0644)
   if err != nil {

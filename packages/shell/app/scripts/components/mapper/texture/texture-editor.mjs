@@ -3,6 +3,7 @@ import { Keyboard } from "../../../services/keyboard.mjs"
 
 import { UrlDialog } from "./dialog-url.mjs"
 import { ColorDialog } from "./dialog-color.mjs"
+import { MaskDialog } from "./dialog-mask.mjs"
 import { VideoTexture, ImageTexture, ColorTexture, MaskTexture  } from "./texture.mjs"
 
 import CSS from "./texture-editor.css" assert { type: "css" }
@@ -32,6 +33,7 @@ export class TextureEditor extends HTMLElement {
 
   #urlDialog = undefined
   #colorDialog = undefined
+  #maskDialog = undefined
 
   #textureList = undefined
   get textures() { return [...this.#textureList] }
@@ -119,8 +121,14 @@ export class TextureEditor extends HTMLElement {
   }
 
   async createMask() {
-    this.#activeTexture = this.#textureList.new({ mask: { color: [0, 255, 0] } })
-    this.#render()
+    this.#keyboard.active = false
+    this.#maskDialog = this.#maskDialog ?? new MaskDialog()
+    const color = await this.#maskDialog.modal()
+    if (color !== undefined) { 
+      this.#activeTexture = this.#textureList.new({ mask: { color } })
+      this.#render()
+    }
+    this.#keyboard.active = true
   }
 
   async createURL() {
@@ -128,7 +136,7 @@ export class TextureEditor extends HTMLElement {
     this.#urlDialog = this.#urlDialog ?? new UrlDialog()
     const url = await this.#urlDialog.modal()
     if (url !== undefined) { 
-      this.#activeTexture = this.#textureList.new({ url })
+      this.#activeTexture = this.#textureList.new({ id, url })
       this.#render()
     }
     this.#keyboard.active = true
@@ -143,14 +151,24 @@ export class TextureEditor extends HTMLElement {
     if (color !== undefined) { 
       const id = this.activeTexture.id
       this.#textureList.delete(this.activeTexture)
-      this.#activeTexture = this.#textureList.new({ color })
+      this.#activeTexture = this.#textureList.new({ id, color })
       this.#render()
     }
     this.#keyboard.active = true
   }
 
   async replaceMask() {
-    console.log("TODO: Add mask")
+    if (this.#activeTexture === undefined) { return }
+    this.#keyboard.active = false
+    this.#maskDialog = this.#maskDialog ?? new MaskDialog()
+    const color = await this.#maskDialog.modal()
+    if (color !== undefined) { 
+      const id = this.activeTexture.id
+      this.#textureList.delete(this.activeTexture)
+      this.#activeTexture = this.#textureList.new({ id, mask: { color } })
+      this.#render()
+    }
+    this.#keyboard.active = true
   }
 
   async replaceURL() {

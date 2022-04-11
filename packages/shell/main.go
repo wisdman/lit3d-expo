@@ -56,10 +56,10 @@ func main() {
     log.Fatalf("%+v\n", err)
   }
   
-  err = chrome.Init()
-  if err != nil {
-    log.Fatalf("%+v\n", err)
-  }
+  // err = chrome.Init()
+  // if err != nil {
+  //   log.Fatalf("%+v\n", err)
+  // }
 
   srv := service.New(cfg.Port, cfg.SSLCert, cfg.SSLKey)
 
@@ -99,7 +99,7 @@ func main() {
 
   srv.ListenAndServe()
 
-  chrome.Run("https://localhost/mapping.html", false)
+  // chrome.Run("https://localhost/mapping.html", false)
 
   stop := make(chan os.Signal, 1)
   signal.Notify(stop, os.Interrupt, syscall.SIGTERM)

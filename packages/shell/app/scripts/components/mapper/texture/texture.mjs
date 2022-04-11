@@ -85,7 +85,8 @@ export class MaskTexture extends GLTextureMixin(EntitiesMaskTexture) {
   static isThisTexture(args) { return super.isThisTexture(args) }
 
   constructor(gl, args = {}) {
-    super(gl, gl.LUMINANCE, 2, 1, gl.LUMINANCE, gl.UNSIGNED_BYTE, new Uint8Array([0, 255]), args)
+    const data = Array.isArray(args.mask?.color) ? new Uint8Array(args.mask.color) : new Uint8Array([0, 255])
+    super(gl, gl.LUMINANCE, data.length, 1, gl.LUMINANCE, gl.UNSIGNED_BYTE, data, args)
   }
 }
 

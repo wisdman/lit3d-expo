@@ -62,19 +62,14 @@ type Texture struct {
   Volume *uint8     `json:"volume,omitempty"`
   Loop   *bool      `json:"loop,omitempty"`
 
-  Color *[2]uint8   `json:"color,omitempty"`
+  Color *[2]uint16  `json:"color,omitempty"`
 
   Mask *TextureMask `json:"mask,omitempty"`
 }
 
 type TextureMask struct {
-  Size [2]uint16 `json:"size"`
-
-  Start  *uint16 `json:"start,omitempty"`
-  End    *uint16 `json:"end,omitempty"`
-  Rotate *uint8  `json:"rotate,omitempty"`
-
-  URL *string    `json:"url,omitempty"`
+  Color []uint16 `json:"color,omitempty"`
+  URL   *string  `json:"url,omitempty"`
 }
 
 type Sound struct {

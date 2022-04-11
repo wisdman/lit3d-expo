@@ -1,6 +1,4 @@
 
-import { UInt8Vector3 } from "/common/types/vector.mjs"
-
 import { Dialog } from "../../dialog/dialog.mjs"
 
 import CSS from "./dialog-texture.css" assert { type: "css" }

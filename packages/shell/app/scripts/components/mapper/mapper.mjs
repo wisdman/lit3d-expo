@@ -220,6 +220,8 @@ export class MapperComponent extends HTMLElement {
     mapping.frames = this.#frameList
     mapping.textures = this.#textureList
     mapping.location = [x,y]
+
+    console.dir(JSON.stringify(mapping))
     await this.#api.SetConfigContentMappingByID(mapping)
   }
 
