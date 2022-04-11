@@ -51,22 +51,17 @@ export class Mapping {
   get fps() { return this.#fps.value }
   set fps(fps) { this.#fps = new UInt8(fps) }
 
-  #url = ""
-  get url() { return this.#url }
-  set url(url = "") { this.#url = String(url) }
-
   #sync = new Array()
   get sync() { return [...this.#sync] }
   set sync(values = []) { this.#sync = [...flatIterator(values)].map(v => String(v)) }
 
-  constructor({ id, title, description, location, frames, textures, url, sync } = {}) {
+  constructor({ id, title, description, location, frames, textures, sync } = {}) {
     this.id = id
     this.title = title
     this.description = description
     this.location = location
     this.frames = frames
     this.textures = textures
-    this.url = url
     this.sync = sync
   }
 
@@ -78,7 +73,6 @@ export class Mapping {
     ...(this.#frames.length ? {frames: this.#frames} : {}),
     ...(this.#textures.length ? {textures: this.#textures} : {}),
     ...(this.#fps ? {fps:this.#fps} : {}),
-    ...(this.#url ? { url: this.#url } : {} ),
     ...(this.#sync.length ? {sync: [...this.#sync] } : {}),
   }}
 }

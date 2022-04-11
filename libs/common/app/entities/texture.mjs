@@ -82,7 +82,7 @@ export class UrlTexture extends Texture {
     super(args)
     this.url = url
     this.volume = volume
-    this.loop = loop
+    this.loop = loop ?? true
   }
 
   toJSON() { return {

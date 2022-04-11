@@ -1,7 +1,6 @@
 package api
 
 import (
-	"encoding/json"
 	"fmt"
 	"net/http"
 
@@ -9,17 +8,9 @@ import (
 )
 
 func (api *API) ChromeF11(w http.ResponseWriter, r *http.Request) {
-	body := struct {
-		WindowID string `json:"windowId"`
-    Key      uint16 `json:"key"`
-  }{}
-	err := json.NewDecoder(r.Body).Decode(&body)
-	if err != nil {
-		service.Fatal(w, err)
-		return
-	}
-
-	prefix := fmt.Sprintf("[%s]", body.WindowID)
+	windowID := service.GetParam(r, "id")
+	prefix := fmt.Sprintf("[%s]", windowID)
+	
 	win, err := api.Chrome.FindWindowPrifix(prefix)
 	if err != nil {
 		service.Fatal(w, err)
@@ -32,6 +23,5 @@ func (api *API) ChromeF11(w http.ResponseWriter, r *http.Request) {
 	}
 
 	win.F11()
-
 	service.ResponseNoContent(w)
 }

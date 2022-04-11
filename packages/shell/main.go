@@ -48,23 +48,7 @@ func main() {
     log.SetOutput(logFile)
   }
 
-  cfg := config.New(configFilePath)
-  
-  if err := cfg.Read(); err != nil {
-    // Log and ignore error
-    log.Printf("%+v\n", err)
-  }
-
-  if err := cfg.Patch(configStr); err != nil {
-    // Log and ignore error
-    log.Printf("%+v\n", err)
-  }
-
-  if err := cfg.ReadContent(); err != nil {
-    // Log and ignore error
-    log.Printf("%+v\n", err)
-  }
-
+  cfg := config.New(configFilePath, configStr)
   cfg.Print()
 
   chrome, err := chromium.New(tempDir)
@@ -81,8 +65,19 @@ func main() {
 
   api := &api.API{ srv.API("/api"), chrome, cfg}
   api.GET("/id", api.GetID)
-  api.GET("/theme", api.GetTheme)
-  api.POST("/chrome/key", api.ChromeF11)
+  api.POST("/chrome/f11/:id", api.ChromeF11)
+
+  api.GET("/content", api.GetContent)
+
+  api.GET("/config", api.GetConfig)
+  api.GET("/config/content", api.GetConfigContent)
+  api.GET("/config/content/exec", api.GetConfigContentExec)
+  api.GET("/config/content/kiosk", api.GetConfigContentKiosk)
+  api.GET("/config/content/mapping", api.GetConfigContentMapping)
+  api.GET("/config/content/mapping/:id", api.GetConfigContentMappingByID)
+  api.POST("/config/content/mapping/:id", api.SetConfigContentMappingByID)
+  api.GET("/config/content/sound", api.GetConfigContentSound)
+  api.GET("/config/theme", api.GetConfigTheme)
 
   var appFS http.FileSystem
   if cfg.AppPath != nil {

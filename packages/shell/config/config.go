@@ -34,8 +34,8 @@ type Config struct {
   Content     Content `json:"-"`
 }
 
-func New(configFilePath string) *Config {
-  return &Config{
+func New(configFilePath string, configStr string) *Config {
+  cfg := &Config{
     filePath:    configFilePath,     
     Master:      "lit3d.expo.local",
     Port:        443,
@@ -45,6 +45,20 @@ func New(configFilePath string) *Config {
     Theme:       "main",
     Content:     Content{},
   }
+
+  if err := cfg.Read(); err != nil {
+    log.Printf("%+v\n", err)
+  }
+
+  if err := cfg.Patch(configStr); err != nil {
+    log.Printf("%+v\n", err)
+  }
+
+  if err := cfg.ReadContent(); err != nil {
+    log.Printf("%+v\n", err)
+  }
+
+  return cfg
 }
 
 func (c *Config) GetID() string {

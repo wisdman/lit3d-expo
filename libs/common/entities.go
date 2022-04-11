@@ -6,7 +6,7 @@ type Content struct {
   Description string `json:"description"`
   
   Exec    []Exec    `json:"exec,omitempty"`
-  Kiosk   []Kiosk   `json:"exec,omitempty"`
+  Kiosk   []Kiosk   `json:"kiosk,omitempty"`
   Mapping []Mapping `json:"mapping,omitempty"`
   Sound   []Sound   `json:"sound,omitempty"`
 }
@@ -42,8 +42,6 @@ type Mapping struct {
   Textures []Texture `json:"textures,omitempty"`
   FPS      *uint8    `json:"fps,omitempty"`
 
-  URL *string        `json:"url,omitempty"`
-  
   Sync *[]string     `json:"sync,omitempty"`
 }
 

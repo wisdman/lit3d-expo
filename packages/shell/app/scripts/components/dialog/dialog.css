@@ -1,0 +1,36 @@
+:host {
+  display: block;
+  position: relative;
+  box-sizing: border-box;
+
+  backdrop-filter: blur(30px);
+
+  --gap: 16px;
+}
+
+dialog {
+  pointer-events: auto;
+  border-radius: 13px;
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--gap);
+}
+
+h1 {
+  margin: 0;
+  font-weight: 600;
+  font-size: 1.2em;
+  text-transform: uppercase;
+}
+
+menu {
+  margin: 0;
+  padding: 0;
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--gap);
+}
+

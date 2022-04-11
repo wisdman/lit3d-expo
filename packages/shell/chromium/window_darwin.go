@@ -25,13 +25,17 @@ func (w *Window) Close() {
 	log.Printf("Chromium [Window.Close] Darwin OS not supported\n")
 }
 
-func (w *Window) SendKeyPress(_ uint16) {
-	log.Printf("Chromium [Window.SendKeyPress] Darwin OS not supported\n")
+func (w *Window) F11() {
+	log.Printf("Chromium [Window.F11] Darwin OS not supported\n")
 }
 
 func (c *Chromium) GetWindows() (*[]Window, error) {
 	log.Printf("Chromium [GetWindows] Darwin OS not supported\n")
 	return nil, nil
+}
+
+func (c *Chromium) FindWindowPrifix(prefix string) (*Window, error) {
+	return &Window{}, nil
 }
 
 func (c *Chromium) WaitWindows(timeout time.Duration) (*[]Window, error) {
@@ -43,3 +47,4 @@ func (c *Chromium) WaitMainWindow(timeout time.Duration) (*Window, error) {
 	log.Printf("Chromium [WaitMainWindow] Darwin OS not supported\n")
 	return nil, nil
 }
+
