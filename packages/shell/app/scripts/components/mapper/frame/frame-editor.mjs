@@ -37,6 +37,22 @@ export class FrameEditor extends HTMLElement {
     return circle
   }
 
+  static Mask([x1, y1, x2, y2]) {
+    const d = `M${x1} ${y1} L${x2} ${y2}`
+    const path = document.createElementNS(SVG_NAMESPACE, "path")
+    path.setAttributeNS(null, "d", d)
+    path.classList.add("mask")
+    return path
+  }
+
+  static Text([x, y], textData) {
+    const text = document.createElementNS(SVG_NAMESPACE, "text")
+    text.setAttributeNS(null, "x", x)
+    text.setAttributeNS(null, "y", y)
+    text.innerHTML = textData
+    return text
+  }
+
   #textureDialog = undefined
 
   #SHORTCUTS = {
@@ -225,6 +241,7 @@ export class FrameEditor extends HTMLElement {
       this.#svg.appendChild(FrameEditor.Corner(frame.corners[1], isActive && this.#activeCorner === 1))
       this.#svg.appendChild(FrameEditor.Corner(frame.corners[2], isActive && this.#activeCorner === 2))
       this.#svg.appendChild(FrameEditor.Corner(frame.corners[3], isActive && this.#activeCorner === 3))
+      // this.#svg.appendChild 
     }
     this.dispatchEvent(new Event("render"))
   }
@@ -262,7 +279,8 @@ export class FrameEditor extends HTMLElement {
     this.shadowRoot.removeChild(this.#textureEditor)
     if (this.activeFrame) {
       if ( texture !== undefined )  { this.activeFrame.texture.id = texture }
-      if ( mask !== undefined ) { this.activeFrame.mask.id = mask }
+      // if ( mask !== undefined ) { this.activeFrame.mask.id = mask }
+      if ( mask !== undefined ) { this.activeFrame.texture.id = mask }
     }
     this.#render()
     this.#keyboard.active = true
@@ -283,7 +301,10 @@ export class FrameEditor extends HTMLElement {
     this.#keyboard.active = true
   }
 
-  editMask() { console.log("TODO: editTexture") }
+  editMask() {
+    if (this.#activeFrame === undefined) { return }
+    console.log("TODO: editMask")
+  }
 
   play() { this.#textureList.get(this.activeFrame.texture)?.play?.() }
   pause() { this.#textureList.get(this.activeFrame.texture)?.pause?.() }

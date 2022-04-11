@@ -64,7 +64,7 @@ export class TextureEditor extends HTMLElement {
       } else if (texture instanceof MaskTexture) {
         node = document.createElement("div")
         node.classList.add("mask")
-        node.innerHTML = texture.mask.join()
+        node.innerHTML = texture.mask.color?.join() ?? texture.mask.url ?? ""
         node.style.backgroundColor = `gray`
       } else { continue }
 
@@ -119,7 +119,8 @@ export class TextureEditor extends HTMLElement {
   }
 
   async createMask() {
-    console.log("TODO: Add mask")
+    this.#activeTexture = this.#textureList.new({ mask: { color: [0, 255, 0] } })
+    this.#render()
   }
 
   async createURL() {

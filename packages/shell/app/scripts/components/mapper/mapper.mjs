@@ -224,7 +224,7 @@ export class MapperComponent extends HTMLElement {
   }
 
   async load() {
-    const {frames, textures} = await this.#api.GetConfigContentMappingByID()
+    const {frames = [], textures = []} = await this.#api.GetConfigContentMappingByID()
     this.#frameList = new FrameList(frames)
     this.#textureList = new TextureList(this.#gl, textures)
   }

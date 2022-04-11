@@ -65,7 +65,7 @@ func main() {
 
   api := &api.API{ srv.API("/api"), chrome, cfg}
   api.GET("/id", api.GetID)
-  api.POST("/chrome/f11/:id", api.ChromeF11)
+  api.GET("/chrome/f11/:id", api.ChromeF11)
 
   api.GET("/content", api.GetContent)
 
@@ -99,7 +99,7 @@ func main() {
 
   srv.ListenAndServe()
 
-  chrome.Run("https://localhost/full-screen.html", false)
+  chrome.Run("https://localhost/mapping.html", false)
 
   stop := make(chan os.Signal, 1)
   signal.Notify(stop, os.Interrupt, syscall.SIGTERM)

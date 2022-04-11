@@ -59,7 +59,7 @@ export class API {
     }
 
     try { 
-      await (await fetch(`${this.class.API_CHROME_F11}/${windowId}`)).json()
+      await fetch(`${this.class.API_CHROME_F11}/${windowId}`)
       return true
     } catch (err) {
       console.error(`API [GetContent] fetch error: ${err}`)

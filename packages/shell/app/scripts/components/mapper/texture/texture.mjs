@@ -17,8 +17,6 @@ const GLTextureMixin = (Base) => class GLTexture extends Base {
 
   #texture = undefined
 
-  get val() { return 1111111 }
-
   constructor(gl, internalformat, width, height, format, type, pixels, ...args) {
     super(...args)
     this.#gl = gl
@@ -87,7 +85,7 @@ export class MaskTexture extends GLTextureMixin(EntitiesMaskTexture) {
   static isThisTexture(args) { return super.isThisTexture(args) }
 
   constructor(gl, args = {}) {
-    super(gl, gl.LUMINANCE, 1, 1, gl.LUMINANCE, gl.UNSIGNED_BYTE, new Uint8Array([255,255,255]), args)
+    super(gl, gl.LUMINANCE, 2, 1, gl.LUMINANCE, gl.UNSIGNED_BYTE, new Uint8Array([0, 255]), args)
   }
 }
 

@@ -3,7 +3,7 @@ import { UInt8 } from "../types/numeric.mjs"
 import { UInt8Vector3 } from "../types/vector.mjs"
 
 import { MAX_VIOLUME } from "./constants.mjs"
-import { TextureMask } from "./texture-mask.mjs"
+import { TextureMask, TextureColorMask, TextureUrlMask } from "./texture-mask.mjs"
 
 export class Texture {
   #id = new UInt8()
@@ -42,9 +42,20 @@ export class ColorTexture extends Texture {
 export class MaskTexture extends Texture {
   static isThisTexture({ mask } = {}) { return mask !== undefined }
 
+  static GET_TEXTURE_MASK_CLASS = args => {
+    if (TextureColorMask.isLinearMask(args)) return TextureColorMask
+    if (TextureUrlMask.isUrlMask(args)) return TextureUrlMask
+    return TextureMask
+  }
+
+  getTextureMaskClass(args) { return Object.getPrototypeOf(this).constructor.GET_TEXTURE_MASK_CLASS(args) }
+
   #mask = new TextureMask()
   get mask() { return this.#mask }
-  set mask(mask) { this.#mask = new TextureMask(mask) }
+  set mask(mask) { 
+    const TextureMaskClass = this.getTextureMaskClass(mask)
+    this.#mask = new TextureMaskClass(mask)
+  }
 
   constructor({ mask, ...args } = {}) {
     super(args)
