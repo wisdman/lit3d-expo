@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/rand"
 	"embed"
 	"flag"
 	"fmt"
@@ -10,7 +11,9 @@ import (
 	"os"
 	"os/signal"
 	"path/filepath"
+	"strings"
 	"syscall"
+	"time"
 
 	"github.com/wisdman/lit3d-expo/libs/common"
 	"github.com/wisdman/lit3d-expo/libs/service"
@@ -30,6 +33,9 @@ var (
 //go:embed app/*
 var appEmbedFS embed.FS
 var APP, _ = fs.Sub(appEmbedFS, "app")
+
+//go:embed app/full-screen.html
+var fullScreen string
 
 func main() {
   fmt.Printf("%s %s\n", execName, revision)
@@ -56,10 +62,10 @@ func main() {
     log.Fatalf("%+v\n", err)
   }
   
-  // err = chrome.Init()
-  // if err != nil {
-  //   log.Fatalf("%+v\n", err)
-  // }
+  err = chrome.Init()
+  if err != nil {
+    log.Fatalf("%+v\n", err)
+  }
 
   srv := service.New(cfg.Port, cfg.SSLCert, cfg.SSLKey)
 
@@ -97,9 +103,30 @@ func main() {
   
   srv.FS("/content/", http.StripPrefix("/content/", http.FileServer(http.Dir(cfg.ContentPath))))
 
+  srv.HandleFunc("/full-screen", func(w http.ResponseWriter, r *http.Request) {
+    n := 5
+    b := make([]byte, n)
+    if _, err := rand.Read(b); err != nil {
+      service.Fatal(w, err)
+      return
+    }
+    id := fmt.Sprintf("%X", b)
+
+    var noCacheHeaders = map[string]string{
+      "Expires":         time.Unix(0, 0).Format(time.RFC1123),
+      "Cache-Control":   "no-cache, private, max-age=0",
+      "Pragma":          "no-cache",
+      "X-Accel-Expires": "0",
+    }
+    for k, v := range noCacheHeaders {
+      w.Header().Set(k, v)
+    }
+    service.ResponseText(w, strings.Replace(fullScreen, "!ID!", id, 1))
+  })
+
   srv.ListenAndServe()
 
-  // chrome.Run("https://localhost/mapping.html", false)
+  chrome.Run("https://localhost", false)
 
   stop := make(chan os.Signal, 1)
   signal.Notify(stop, os.Interrupt, syscall.SIGTERM)

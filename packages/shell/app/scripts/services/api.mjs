@@ -45,7 +45,9 @@ export class API {
 
   // === Window & Broeser ===
 
-  #setDocumentTitle = (id, title) => document.title = `${id ? `[${id}]` : ""}${title}`
+  #setDocumentTitle = (id, title) => {
+    document.head.querySelector("title").innerText = document.title = `${id ? `[${id}]` : ""}${title}`
+  }
 
   GetWindowID() { return WINDOW_ID_RX.exec(document.title)?.groups?.id?.trim() ?? "" }
   SetWindowID(id) { this.#setDocumentTitle(id, this.GetWindowTitle())  }

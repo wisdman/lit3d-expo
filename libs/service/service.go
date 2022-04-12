@@ -76,7 +76,11 @@ func (service *Service) Shutdown() {
 }
 
 func (service *Service) FS(pattern string, handler http.Handler) {
-	service.mux.Handle(pattern, handler)
+	service.mux.Handle(pattern, NoCache(handler))
+}
+
+func (service *Service) HandleFunc(pattern string, handler http.HandlerFunc) {
+	service.mux.HandleFunc(pattern, handler)
 }
 
 func (service *Service) API(pattern string) *API {
@@ -85,6 +89,6 @@ func (service *Service) API(pattern string) *API {
 		trees: make(map[string]*Node),
 		pattern: pattern,
 	}
-	service.mux.Handle(pattern + "/", api)
+	service.mux.Handle(pattern + "/", NoCache(api))
 	return api
 }

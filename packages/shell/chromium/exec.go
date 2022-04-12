@@ -7,7 +7,7 @@ import (
 
 func (c *Chromium) Command(url string, kioskMode bool) *exec.Cmd {
 	args := []string{
-		fmt.Sprintf("--user-data-dir=%s", c.dataPath),
+		// fmt.Sprintf("--user-data-dir=%s", c.dataPath),
 		fmt.Sprintf("--profile-directory=%s", c.profile),
 		"--autoplay-policy=no-user-gesture-required",
 		"--disable-background-timer-throttling",

@@ -13,10 +13,11 @@ export class FullScreenComponent extends HTMLElement {
   }
 
   async connectedCallback() {
-    const windowId = Math.random().toString(16).slice(2)
-    await this.#api.SetWindowID(windowId)
+    const windowId = this.#api.GetWindowID()
+    // await this.#api.SetWindowID(windowId)
     await this.#api.ChromeF11(windowId)
-    await this.#api.SetWindowID(null)
+  
+    // await this.#api.SetWindowID(null)
     this.shadowRoot.appendChild(new MapperComponent())
   }
 }

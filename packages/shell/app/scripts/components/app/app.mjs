@@ -9,16 +9,16 @@ export class AppComponent extends HTMLElement {
     const features = [
       `left=${left}`,
       `top=${top}`,
-      `width=700`,
-      `height=700`,
-      `menubar=no`,
-      `toolbar=no`,
-      `location=no`,
-      `status=no`,
-      `resizable=yes`,
-       `scrollbars=no`
+      `width=1000`,
+      `height=1000`,
+      // `menubar=no`,
+      // `toolbar=no`,
+      // `location=no`,
+      // `status=no`,
+      // `resizable=yes`,
+       // `scrollbars=no`
     ].join(",")
-    return window.open(`full-screen.html#${id}`, `mapping-${id}`, features)
+    return window.open(`/full-screen#${id}`, `mapping-${id}`, features)
   }
 
   #SHORTCUTS = {
@@ -41,8 +41,10 @@ export class AppComponent extends HTMLElement {
   }
 
   async connectedCallback() {
+    this.#keyboard.active = true
     this.#screens = (await window.getScreenDetails()).screens
     const mapping = await this.#api.GetConfigContentMapping()
+    console.log(mapping)
     for (const {id, location:[left, top]} of mapping) {
       const win = AppComponent.MappingWindow(id, left, top)
     }

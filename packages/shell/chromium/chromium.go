@@ -13,7 +13,7 @@ const (
   chromiumPath        = "./chromium"
   chromiumBinaryPath  = chromiumPath + "/" + chromiumBinary
   chromiumDataPath    = "./chromium-data"
-  chromiumProfilePath = "./chromium-data" + profile
+  chromiumProfilePath = chromiumDataPath + "/" + profile
 )
 
 type Chromium struct {

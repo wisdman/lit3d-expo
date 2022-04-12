@@ -54,7 +54,7 @@ export class TextureDialog extends Dialog {
       if (parts > 1) {
         for (let i = 0; i < parts; i++) {
           const span = document.createElement("span")
-          span.addEventListener("click", () => getData(parts, i))
+          span.addEventListener("pointerdown", () => getData(parts, i))
           selectorNode.appendChild(span)
         }
         return
