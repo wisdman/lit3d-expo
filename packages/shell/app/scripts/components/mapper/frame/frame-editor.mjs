@@ -5,6 +5,7 @@ import { DEFAULT_RESOLUTION } from "/common/entities/constants.mjs"
 import { TextureEditor } from "../texture/texture-editor.mjs"
 
 import { TextureDialog } from "./dialog-texture.mjs"
+import { SizeDialog } from "./dialog-size.mjs"
 
 import CSS from "./frame-editor.css" assert { type: "css" }
 
@@ -62,6 +63,7 @@ export class FrameEditor extends HTMLElement {
   }
 
   #textureDialog = undefined
+  #sizeDialog = undefined
 
   #SHORTCUTS = {
     // Mapping mode
@@ -155,6 +157,7 @@ export class FrameEditor extends HTMLElement {
 
     [`[${MODE_TEXTURE}]R`]: this.resizeTexture, // Reset texture
     [`[${MODE_TEXTURE}]SHIFT+R`]: this.resetTexture, // Reset texture
+    [`[${MODE_TEXTURE}]SHIFT+S`]: this.setTextureSize, // Set size
 
     [`[${MODE_TEXTURE}]ARROWLEFT`]: this.moveTextureLeft,       // Move texture left
     [`[${MODE_TEXTURE}]SHIFT+ARROWLEFT`]: this.moveTextureLeft, // Move texture left
@@ -338,7 +341,6 @@ export class FrameEditor extends HTMLElement {
     this.#keyboard.active = true
   }
 
-
   resetTexture() {
     if (this.#activeFrame === undefined) { return }
     const texture = this.#textureList.get({ id: this.activeFrame.texture.id })
@@ -360,6 +362,19 @@ export class FrameEditor extends HTMLElement {
     const dh = Math.round((Math.max(y1,y2) - Math.min(y1,y2)) * h)
     this.activeFrame.size = [dw, dh]
     this.#render()
+  }
+
+  async setTextureSize() {
+    if (this.#activeFrame === undefined) { return }
+    this.#keyboard.active = false
+    this.#sizeDialog = this.#sizeDialog = new SizeDialog()
+    const size = await this.#sizeDialog.modal()
+    if (size !== undefined) { 
+      const [w, h] = size
+      this.activeFrame.size = [w, h]
+      this.#render()
+    }
+    this.#keyboard.active = true
   }
 
   resizeMask() {

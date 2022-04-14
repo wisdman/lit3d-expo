@@ -70,6 +70,7 @@ export class SoundComponent extends HTMLElement {
       audioNode.muted = item.muted
       audioNode.loop = true
       itemNode.appendChild(audioNode)
+      audioNode.addEventListener("volumechange", () => item.volume = Math.floor(Number(audioNode.volume) * 100))
 
       const deleteBtn = document.createElement("button")
       deleteBtn.innerHTML = "DELETE"

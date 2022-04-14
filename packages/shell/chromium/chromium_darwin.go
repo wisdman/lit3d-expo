@@ -6,6 +6,7 @@ import "log"
 
 const (
   chromiumBinary = "chrome"
+  chromiumPath   = "./chromium"
 )
 
 func (c *Chromium) Kill() error {
