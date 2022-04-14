@@ -30,6 +30,10 @@ node_modules/
 /packages/shell/chromium/chromium-*.zip
 /packages/shell-2/chromium/chromium-*.zip
 
+### Chromium directory ###
+/chromium/*
+!/chromium/.gitkeep
+
 ### Content directory ###
 /content/*
 !/content/.gitkeep

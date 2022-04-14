@@ -1,2 +1,2 @@
-shell.exe -d
+shell.exe -v
 pause

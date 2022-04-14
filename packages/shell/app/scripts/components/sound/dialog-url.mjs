@@ -1,16 +1,9 @@
 
-import { API } from "../../../services/api.mjs"
+import { API } from "../../services/api.mjs"
 
-import { Dialog } from "../../dialog/dialog.mjs"
-
-import { VideoTexture, ImageTexture } from "./texture.mjs"
+import { Dialog } from "../dialog/dialog.mjs"
 
 const CURRENT_PATH = import.meta.url.replace(/[^\/]+$/, "")
-
-const DEFAULT_CONTENT_LIST = [
-  new URL(`${CURRENT_PATH}pattern.avif`).pathname,
-  new URL(`${CURRENT_PATH}pattern.mkv`).pathname
-]
 
 import CSS from "./dialog-url.css" assert { type: "css" }
 const TEMPLATE = await (await fetch(`${CURRENT_PATH}dialog-url.tpl`)).text()
@@ -27,7 +20,7 @@ export class UrlDialog extends Dialog {
   #api = new API()
 
   async init(root) {
-    const contentList = [...DEFAULT_CONTENT_LIST, ...(await this.#api.GetContentGraphic())]
+    const contentList = await this.#api.GetContentSound()
     const selectNode = root.querySelector("select")
     for (const value of contentList) {
       const option = document.createElement("option")
@@ -36,31 +29,17 @@ export class UrlDialog extends Dialog {
       selectNode.appendChild(option)
     }
 
-    const imgNode = root.querySelector("img")
-    const videoNode = root.querySelector("video")
-    videoNode.controls = false
+    const audioNode = root.querySelector("audio")
+    audioNode.controls = true
 
     selectNode.addEventListener("keydown", ({key}) => key.toUpperCase() === "ENTER" && this.submit(CONFIRM))
 
     selectNode.addEventListener("change", () => {
       const url = selectNode.value
-
-      if (VideoTexture.isThisTexture({url})) {
-        videoNode.src = url
-        videoNode.classList.add("active")
-        videoNode.play()
-      } else {
-        videoNode.classList.remove("active")
-        videoNode.pause()
-      }
-      
-      if (ImageTexture.isThisTexture({url})) {
-        imgNode.src = url
-        imgNode.classList.add("active")
-      } else {
-        imgNode.classList.remove("active")
-      }
+      audioNode.src = url
+      audioNode.play()
     })
+    
     selectNode.dispatchEvent(new Event("change"))
   }
 
@@ -69,4 +48,4 @@ export class UrlDialog extends Dialog {
   }
 }
 
-customElements.define("ss-dialog-url-graphic", UrlDialog)
+customElements.define("ss-dialog-url-sound", UrlDialog)

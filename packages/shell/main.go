@@ -73,7 +73,8 @@ func main() {
   api.GET("/id", api.GetID)
   api.GET("/chrome/f11/:id", api.ChromeF11)
 
-  api.GET("/content", api.GetContent)
+  api.GET("/content/graphic", api.GetContentGraphic)
+  api.GET("/content/sound", api.GetContentSound)
 
   api.GET("/config", api.GetConfig)
   api.GET("/config/content", api.GetConfigContent)
@@ -83,6 +84,7 @@ func main() {
   api.GET("/config/content/mapping/:id", api.GetConfigContentMappingByID)
   api.POST("/config/content/mapping/:id", api.SetConfigContentMappingByID)
   api.GET("/config/content/sound", api.GetConfigContentSound)
+  api.POST("/config/content/sound", api.SetConfigContentSound)
   api.GET("/config/theme", api.GetConfigTheme)
 
   var appFS http.FileSystem

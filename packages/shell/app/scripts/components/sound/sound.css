@@ -1,0 +1,26 @@
+:host {
+  position: relative;
+  box-sizing: border-box;
+
+  border: 1px solid #24292f;
+  display: grid;
+  grid-template-columns: auto 60px 60px;
+  gap: 16px;
+  padding: 16px;
+
+  pointer-events: auto;
+}
+
+.items {
+  grid-area: 1 / 1 / span 1 / -1;
+  display: grid;
+
+}
+
+.add-button {
+  grid-area: 2 / span 1 / span 1 / -2;
+}
+
+.save-button {
+  grid-area: 2 / span 1 / span 1 / -1;
+}

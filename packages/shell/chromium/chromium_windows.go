@@ -9,6 +9,7 @@ import (
 )
 
 const (
+  chromiumPath = "./chromium"
   chromiumBinary = "chrome.exe"
 )
 

@@ -63,6 +63,26 @@ func (api *API) GetConfigContentSound(w http.ResponseWriter, r *http.Request) {
 	service.ResponseJSON(w, api.Config.Content.GetSound())
 }
 
+func (api *API) SetConfigContentSound(w http.ResponseWriter, r *http.Request) {
+	var sound = &[]common.Sound{}
+	if err := service.JSONBody(r, sound); err != nil {
+		log.Printf("API [GetConfigContentSound] error: %+v\n", err)
+		service.Error(w, http.StatusBadRequest)
+		return
+	}
+
+	api.Config.Content.Sound = *sound
+
+	if err := api.Config.WriteContent(); err != nil {
+		log.Printf(" %+v\n", err)
+		service.Error(w, http.StatusInternalServerError)
+		return
+	}
+
+	service.ResponseJSON(w, sound)
+}
+
+
 func (api *API) GetConfigTheme(w http.ResponseWriter, r *http.Request) {
 	service.ResponseText(w, api.Config.Theme)
 }

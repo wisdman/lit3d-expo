@@ -19,6 +19,9 @@ export class API {
  
   static API_CHROME_F11 = `${this.API_CHROME}/f11`
 
+  static API_CONTENT_GRAPHIC = `${this.API_CONTENT}/graphic`
+  static API_CONTENT_SOUND = `${this.API_CONTENT}/sound`
+
   static API_CONFIG_CONTENT = `${this.API_CONFIG}/content`
   static API_CONFIG_THEME   = `${this.API_CONFIG}/theme`
   
@@ -71,9 +74,18 @@ export class API {
 
   // === Content List ===
 
-  async GetContent() {
+  async GetContentGraphic() {
     try { 
-      return await (await fetch(`${this.class.API_CONTENT}`)).json()
+      return await (await fetch(`${this.class.API_CONTENT_GRAPHIC}`)).json()
+    } catch (err) {
+      console.error(`API [GetContent] fetch error: ${err}`)
+      return []
+    }
+  }
+
+  async GetContentSound() {
+    try { 
+      return await (await fetch(`${this.class.API_CONTENT_SOUND}`)).json()
     } catch (err) {
       console.error(`API [GetContent] fetch error: ${err}`)
       return []
@@ -189,6 +201,23 @@ export class API {
     } catch (err) {
       console.error(`API [GetConfigContentSound] fetch error: ${err}`)
       return []
+    }
+  }
+
+  async SetConfigContentSound(list = []) {
+    try { 
+      await fetch(`${this.class.API_CONFIG_CONTENT_SOUND}`, {
+        method: "POST",
+        headers: {
+          "Accept": "application/json",
+          "Content-Type": "application/json; charset=utf-8",
+        },
+        body: JSON.stringify(list)
+      })
+      return true
+    } catch (err) {
+      console.error(`API [SetConfigContentSound] fetch error: ${err}`)
+      return false
     }
   }
 }

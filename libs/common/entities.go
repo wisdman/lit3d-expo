@@ -76,8 +76,9 @@ type Sound struct {
   Title       string  `json:"title"`
   Description string  `json:"description"`
 
-  URL string          `json:"url"`
+  Enable bool `json:"enable"`
 
+  URL string          `json:"url"`
   Volume uint8        `json:"Volume"`
 
   Loop *bool          `json:"loop,omitempty"`

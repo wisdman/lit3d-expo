@@ -5,10 +5,13 @@
 
   display: grid;
   grid-template-columns: 100%;
-  grid-template-rows: 100%;
+/*  grid-template-rows: 100%;*/
 
   justify-items: stretch;
-  align-items: stretch;
+  align-items: start;
+
+  background-color: rgb(200 200 200 / 1);
 }
 
-:host > * { grid-area: 1 / 1 / -1 / -1; }
+/*:host > * { grid-area: 1 / 1 / -1 / -1; }*/
+

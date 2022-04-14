@@ -10,7 +10,7 @@ const (
   profile    = "lit3d-expo"
   defaultUrl = "https://localhost"
 
-  chromiumPath        = "./chromium"
+  // chromiumPath        = "./chromium"
   chromiumBinaryPath  = chromiumPath + "/" + chromiumBinary
   chromiumDataPath    = "./chromium-data"
   chromiumProfilePath = chromiumDataPath + "/" + profile
@@ -31,12 +31,12 @@ func New(baseDir string) (*Chromium, error) {
     baseDir = os.TempDir()
   }
 
-  absPath, err := filepath.Abs(filepath.Join(baseDir, chromiumPath))
+  absPath, err := filepath.Abs(chromiumPath)
   if err != nil {
     return nil, fmt.Errorf("Chromium [New] Incorrect path: %w", err)
   }
 
-  absBinaryPath, err := filepath.Abs(filepath.Join(baseDir, chromiumBinaryPath))
+  absBinaryPath, err := filepath.Abs(chromiumBinaryPath)
   if err != nil {
     return nil, fmt.Errorf("Chromium [New] Incorrect binary path: %w", err)
   }

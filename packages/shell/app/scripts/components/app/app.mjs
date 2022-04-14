@@ -2,6 +2,8 @@
 import { API } from "../../services/api.mjs" 
 import { Keyboard } from "../../services/keyboard.mjs"
 
+import { SoundComponent } from "../sound/sound.mjs"
+
 import CSS from "./app.css" assert { type: "css" }
 
 export class AppComponent extends HTMLElement {
@@ -32,6 +34,7 @@ export class AppComponent extends HTMLElement {
   constructor() {
     super()
     this.attachShadow({mode: "open"}).adoptedStyleSheets = [CSS]
+    this.shadowRoot.appendChild(new SoundComponent())
   }
 
   generateMapping() {
@@ -44,7 +47,6 @@ export class AppComponent extends HTMLElement {
     this.#keyboard.active = true
     this.#screens = (await window.getScreenDetails()).screens
     const mapping = await this.#api.GetConfigContentMapping()
-    console.log(mapping)
     for (const {id, location:[left, top]} of mapping) {
       const win = AppComponent.MappingWindow(id, left, top)
     }

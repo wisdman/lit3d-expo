@@ -1,5 +1,6 @@
 
 import { UInt8, UInt16 } from "../types/numeric.mjs"
+import { flatIterator } from "../types/utils.mjs"
 
 import { MAX_VIOLUME } from "./constants.mjs"
 
@@ -28,6 +29,10 @@ export class Sound {
     this.#description = description
   }
 
+  #enable = Boolean(false)
+  get enable() { return this.#enable }
+  set enable(enable = false) { this.#enable = Boolean(enable) }
+
   #url = ""
   get url() { return this.#url }
   set url(url = "") { this.#url = String(url) }
@@ -54,13 +59,14 @@ export class Sound {
   get sync() { return [...this.#sync] }
   set sync(values = []) { this.#sync = [...flatIterator(values)].map(v => String(v)) }
 
-  constructor({ id, title, description, url, volume, loop, timer, sync } = {}) {
-    this.id = id
-    this.title = title
+  constructor({ id, title, description, enable, url, volume, loop, timer, sync } = {}) {
+    this.id = id ?? Math.random().toString(36).replace("0.","")
+    this.title = title ?? url
     this.description = description
+    this.enable = enable ?? true
     this.url = url
-    this.volume = volume
-    this.loop = loop
+    this.volume = volume ?? 100
+    this.loop = loop ?? true
     this.timer = timer
     this.sync = sync
   }
@@ -69,6 +75,7 @@ export class Sound {
     id: this.#id,
     title: this.#title,
     description: this.#description,
+    enable: this.enable,
     url: this.#url,
     volume: this.#volume,
     ...(this.#loop ? { loop: true } : {}),

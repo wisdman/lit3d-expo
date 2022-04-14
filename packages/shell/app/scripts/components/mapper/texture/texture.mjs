@@ -106,6 +106,8 @@ export class MaskTexture extends GLTextureMixin(EntitiesTexture) {
     return new Uint8Array([...left, ...center, ...right])
   }
 
+  update = () => {}
+
   constructor(gl, args = {}) {
     const color = MaskTexture.BuildMask(args)
     super(gl, gl.LUMINANCE, color.length, 1, gl.LUMINANCE, gl.UNSIGNED_BYTE, color, args)
@@ -125,8 +127,6 @@ class UrlTexture extends GLTextureMixin(EntitiesUrlTexture) {
   }
 
   static clean() { this.cache.clear() }
-
-  update = () => {}
 
   constructor(gl, args = {}) {
     super(gl, gl.RGB, 1, 1, gl.RGB, gl.UNSIGNED_BYTE, new Uint8Array([0,0,0]), args)
@@ -177,6 +177,8 @@ export class ImageTexture extends UrlTexture {
     super(...args)
     this.#init()
   }
+
+  // update = () => {}
 
   #init = () => {
     this.#image.addEventListener("load", () => super.update())

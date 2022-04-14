@@ -63,7 +63,7 @@ func (c *Content) SetMappingByID(item *common.Mapping) {
 }
 
 func (c *Content) GetSound() *[]common.Sound {
-  if c.Mapping == nil {
+  if c.Sound == nil {
     empty := make([]common.Sound, 0)
     return &empty
   }

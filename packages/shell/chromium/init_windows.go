@@ -20,13 +20,13 @@ func (c *Chromium) Init() error {
     return err
   }
 
-  if err := c.Clear(); err != nil {
-    return err
-  }
+  // if err := c.Clear(); err != nil {
+  //   return err
+  // }
   
-  if err := c.Extract(); err != nil {
-    return err
-  }
+  // if err := c.Extract(); err != nil {
+  //   return err
+  // }
 
   // errChan := make(chan error, 1)
   // successChan := make(chan bool, 1)
