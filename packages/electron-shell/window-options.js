@@ -18,7 +18,7 @@ module.exports = {
   webPreferences: {
     defaultEncoding: "utf8",
 
-    devTools: false,
+    devTools: true,
     nodeIntegration: false,
     nodeIntegrationInWorker: false,
     nodeIntegrationInSubFrames: false,
@@ -27,7 +27,7 @@ module.exports = {
     backgroundThrottling: false,
     spellcheck: false,
 
-    experimentalFeatures: true,
+    experimentalFeatures: false,
     disableDialogs: true,
   },
 }

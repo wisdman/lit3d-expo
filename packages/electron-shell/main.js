@@ -1,4 +1,6 @@
 const {app, BrowserWindow, powerSaveBlocker, screen, globalShortcut, session} = require("electron")
+const { Worker } = require("worker_threads")
+
 const path = require("path")
 
 const WINDOW_OPTIONS = require("./window-options.js")
@@ -30,8 +32,9 @@ function exit() {
 }
 
 async function reload() {
+  console.log("Reload")
   await session.defaultSession.clearStorageData()
-  // windows.forEach(w => w.loadURL(SS_URL))
+  windows.forEach(w => w.reload())
 }
 
 function getDisplays() {
@@ -45,11 +48,12 @@ function startServer() {
     const workerPath = path.join(__dirname, "server.js")
     serverWorker = new Worker(workerPath, {workerData: LOCAL_SERVER_PORT })
     serverWorker.on("error", reject)
+    serverWorker.on("message", ({command} = {}) => command === "reload" && reload())
     serverWorker.once("message", () => resolve(serverWorker))
   })
 }
 
-function createWindow (id = 0, {x = 0, y = 0, width = 800, height = 600} = {}) {
+function createWindow ({id = 0, x = 0, y = 0, width = 800, height = 600} = {}) {
   let win = new BrowserWindow({ ...WINDOW_OPTIONS, x, y, width, height })
 
     win.on("closed", () => {
@@ -60,12 +64,14 @@ function createWindow (id = 0, {x = 0, y = 0, width = 800, height = 600} = {}) {
     win.removeMenu()
     win.loadURL(`${URL}#${id}`)
     win.show()
+    win.webContents.openDevTools()
     
     windows.push(win)
 }
 
 async function initViewPorts() {
-  
+  const { screens } = require("./config.json")
+  screens.forEach(createWindow)
 }
 
 async function initGlobalShortcut() {

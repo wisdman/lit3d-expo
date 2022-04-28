@@ -153,8 +153,8 @@ export class VideoTexture extends UrlTexture {
     super(...args)
     this.#video.controls = false
     this.#video.autoplay = false
-    this.#video.volume = this.volume
-    this.#video.muted = this.muted
+    this.#video.volume = 1 // this.volume
+    this.#video.muted = false // this.muted
     this.#video.loop = true
     this.#init()
   }
