@@ -43,6 +43,7 @@ const MIME_DEFAULT = "application/octet-stream"
 
 const HEADERS = {
   "Cache-Control": "no-cache, must-revalidate, max-age=0",
+  "Content-Security-Policy": "default-src 'self'; script-src 'self';",
 }
 
 
@@ -99,7 +100,10 @@ async function setConfig(request) {
       })
 
       filestream.end(data)
-      filestream.close(() => resolve())
+      filestream.close(() => {
+        resolve()
+        parentPort?.postMessage({ command: "reload" })
+      })
     })
   })
 }
