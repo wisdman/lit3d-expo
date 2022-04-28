@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en" translate="no">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+</head>
+<body>
+   <script type="text/javascript">
+     void function (argument) {
+       const circle = document.createElement("div")
+       circle.style.position = "absolute"
+       circle.style.boxSizing = "border-box"
+       circle.style.width = "100vw"
+       circle.style.height = "100vh"
+       circle.style.left = "0"
+       circle.style.top = "0"
+       circle.style.zIndex = "999"
+       circle.style.pointerEvents = "none"
+       
+
+       let x = 0
+       let y = 0
+       let p = 10
+
+       const render = () => {
+        circle.style.background = `radial-gradient(circle at center center, transparent, transparent ${p}%, rgb(0 0 0 / .95) ${p}%, rgb(0 0 0 / .95))`
+        circle.style.backgroundPosition = `${x}px ${y}px`
+       }
+
+       window.addEventListener("pointermove", ({clientX, clientY}) => {
+        const { width, height } = circle.getBoundingClientRect()
+        x = Math.round(clientX - width/2)
+        y = Math.round(clientY - height/2)
+        render()
+       })
+
+       
+       window.addEventListener("keydown", ({key}) => {
+        switch (key) {
+        case "=":
+          p++
+          break
+        case "-":
+          p--
+          break
+        default:
+          return
+        }
+        render()
+       }, {passive: true })
+
+       document.body.appendChild(circle)
+       render()
+     }()
+   </script>
+</body>
+</html>

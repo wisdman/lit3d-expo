@@ -1,0 +1,31 @@
+:host {
+  display: grid;
+  position: relative;
+  box-sizing: content-box;
+ 
+  grid-template-columns: 100%;
+  grid-template-rows: 100%;
+
+  justify-items: stretch;
+  align-items: stretch;
+
+  overflow: clip;
+  pointer-events: auto;
+
+  border: 1px solid #000;
+
+  height: 200px;
+  width: auto;
+  aspect-ratio: var(--width) / var(--height);
+}
+
+:host > * {
+  position: relative;
+  grid-area: 1 / 1 / -1 / -1;
+  pointer-events: none;
+}
+
+input {
+  visibility: hidden;
+  z-index: -1;
+}

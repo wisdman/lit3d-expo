@@ -1,0 +1,11 @@
+{
+  "name": "electron-shell",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "node server.js"
+  },
+  "devDependencies": {
+    "electron": "^18.1.0"
+  }
+}
